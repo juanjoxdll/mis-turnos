@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis Turnos</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --text:#172033;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --primary:#6d4aff;
+      --morning:#dbeeff;
+      --afternoon:#fff0cf;
+      --night:#eadfff;
+      --rest:#dff7ee;
+      --today:#6d4aff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .app{
+      width:min(1100px,100%);
+      margin:auto;
+      padding:18px;
+    }
+    .topbar{
+      display:flex;
+      gap:14px;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+    h1{margin:0;font-size:clamp(28px,4vw,42px)}
+    .subtitle{color:var(--muted);margin-top:4px}
+    button,input{
+      font:inherit;
+    }
+    button{
+      border:0;
+      border-radius:12px;
+      padding:10px 14px;
+      cursor:pointer;
+      background:#111827;
+      color:white;
+    }
+    button.secondary{
+      background:white;
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+    .grid-top{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:16px;
+      margin-bottom:16px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 8px 24px rgba(15,23,42,.05);
+    }
+    .today-main{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .badge{
+      width:64px;height:64px;border-radius:18px;
+      display:grid;place-items:center;
+      font-size:30px;
+    }
+    .today-title{font-size:24px;font-weight:800}
+    .meta{color:var(--muted);margin-top:4px}
+    .statline{
+      margin-top:14px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      padding:8px 10px;
+      border-radius:999px;
+      background:#f3f4f6;
+      font-size:14px;
+    }
+    .search{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .search input{
+      flex:1;
+      min-width:190px;
+      border:1px solid var(--line);
+      padding:11px 12px;
+      border-radius:12px;
+      background:white;
+      color:var(--text);
+    }
+    .search-result{
+      margin-top:14px;
+      padding:12px;
+      border-radius:12px;
+      background:#f8fafc;
+      min-height:48px;
+    }
+    .calendar-card{padding:0;overflow:hidden}
+    .calendar-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:16px;
+      border-bottom:1px solid var(--line);
+      flex-wrap:wrap;
+    }
+    .calendar-header h2{margin:0;font-size:24px}
+    .nav{display:flex;gap:8px}
+    .weekdays,.calendar{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+    }
+    .weekdays{
+      background:#fafafa;
+      border-bottom:1px solid var(--line);
+    }
+    .weekdays div{
+      padding:12px 6px;
+      text-align:center;
+      font-size:13px;
+      color:var(--muted);
+      font-weight:700;
+    }
+    .day{
+      min-height:118px;
+      border-right:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+      padding:9px;
+      background:white;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+    .day:hover{transform:translateY(-1px);box-shadow:inset 0 0 0 2px rgba(109,74,255,.15)}
+    .day:nth-child(7n){border-right:0}
+    .day.outside{background:#fafafa;color:#9ca3af}
+    .day-number{
+      width:30px;height:30px;border-radius:50%;
+      display:grid;place-items:center;
+      font-weight:700;
+      margin-bottom:9px;
+    }
+    .day.today .day-number{
+      background:var(--today);color:white;
+    }
+    .event{
+      border-radius:8px;
+      padding:6px 7px;
+      font-size:12px;
+      font-weight:700;
+      line-height:1.25;
+    }
+    .morning{background:var(--morning)}
+    .afternoon{background:var(--afternoon)}
+    .night{background:var(--night)}
+    .rest{background:var(--rest)}
+    .legend{
+      display:flex;gap:10px;flex-wrap:wrap;
+      margin-top:14px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .legend span{
+      padding:7px 10px;border-radius:999px;color:var(--text);
+    }
+    .modal{
+      position:fixed;inset:0;
+      background:rgba(15,23,42,.45);
+      display:none;
+      place-items:center;
+      padding:16px;
+      z-index:20;
+    }
+    .modal.show{display:grid}
+    .modal-box{
+      width:min(430px,100%);
+      background:white;border-radius:20px;padding:20px;
+      box-shadow:0 24px 60px rgba(15,23,42,.25);
+    }
+    .modal-top{
+      display:flex;justify-content:space-between;gap:12px;align-items:start;
+    }
+    .close{
+      background:#f3f4f6;color:#111827;
+      width:38px;height:38px;padding:0;
+      border-radius:50%;
+    }
+    .detail-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+      margin-top:16px;
+    }
+    .detail{
+      padding:12px;border-radius:12px;background:#f8fafc;
+    }
+    .detail small{color:var(--muted);display:block;margin-bottom:4px}
+    @media(max-width:760px){
+      .grid-top{grid-template-columns:1fr}
+      .app{padding:10px}
+      .day{min-height:78px;padding:6px}
+      .event{font-size:10px;padding:5px}
+      .weekdays div{font-size:11px}
+      .calendar-header h2{font-size:20px}
+      .detail-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="topbar">
+      <div>
+        <h1>Mis Turnos</h1>
+        <div class="subtitle">Calendario automático de 4 turnos</div>
+      </div>
+      <button id="todayBtn">Ir a hoy</button>
+    </div>
+
+    <section class="grid-top">
+      <article class="card">
+        <div class="today-main">
+          <div id="todayBadge" class="badge"></div>
+          <div>
+            <div id="todayTitle" class="today-title">Cargando...</div>
+            <div id="todayMeta" class="meta"></div>
+          </div>
+        </div>
+        <div class="statline">
+          <div id="nextRest" class="pill"></div>
+          <div id="nextChange" class="pill"></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <strong>Buscar una fecha</strong>
+        <div class="search" style="margin-top:10px">
+          <input id="dateSearch" type="date" />
+          <button id="searchBtn">Consultar</button>
+        </div>
+        <div id="searchResult" class="search-result">Selecciona una fecha.</div>
+      </article>
+    </section>
+
+    <section class="card calendar-card">
+      <div class="calendar-header">
+        <h2 id="monthTitle"></h2>
+        <div class="nav">
+          <button id="prevBtn" class="secondary">←</button>
+          <button id="nextBtn" class="secondary">→</button>
+        </div>
+      </div>
+
+      <div class="weekdays">
+        <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div>
+        <div>Vie</div><div>Sáb</div><div>Dom</div>
+      </div>
+      <div id="calendar" class="calendar"></div>
+    </section>
+
+    <div class="legend">
+      <span class="morning">🌅 Mañana</span>
+      <span class="afternoon">🌇 Tarde</span>
+      <span class="night">🌙 Noche</span>
+      <span class="rest">😴 Descanso</span>
+    </div>
+  </main>
+
+  <div id="modal" class="modal">
+    <div class="modal-box">
+      <div class="modal-top">
+        <div>
+          <h2 id="modalDate" style="margin:0"></h2>
+          <div id="modalStatus" class="meta"></div>
+        </div>
+        <button id="closeModal" class="close">✕</button>
+      </div>
+      <div class="detail-grid">
+        <div class="detail"><small>Turno</small><strong id="modalShift"></strong></div>
+        <div class="detail"><small>Horario</small><strong id="modalSchedule"></strong></div>
+        <div class="detail"><small>Próximo descanso</small><strong id="modalRest"></strong></div>
+        <div class="detail"><small>Próximo cambio</small><strong id="modalChange"></strong></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const MS_DAY = 86400000;
+
+  // FECHA BASE CONFIRMADA:
+  // 14 de junio de 2026 = inicio del Turno 1.
+  const BASE_DATE = new Date(2026, 5, 14);
+  BASE_DATE.setHours(12,0,0,0);
+
+  const TURNOS = {
+    1: {
+      nombre: "Turno 1",
+      horarioPrincipal: "Mañana",
+      semana: {
+        0:"Mañana", 1:"Mañana", 2:"Mañana", 3:"Mañana",
+        4:"Mañana", 5:"Mañana", 6:"Descanso"
+      }
+    },
+    2: {
+      nombre: "Turno 2",
+      horarioPrincipal: "Tarde",
+      semana: {
+        0:"Descanso", 1:"Tarde", 2:"Tarde", 3:"Tarde",
+        4:"Tarde", 5:"Tarde", 6:"Tarde"
+      }
+    },
+    3: {
+      nombre: "Turno 3",
+      horarioPrincipal: "Noche",
+      semana: {
+        0:"Noche", 1:"Descanso", 2:"Descanso", 3:"Noche",
+        4:"Noche", 5:"Noche", 6:"Noche"
+      }
+    },
+    4: {
+      nombre: "Turno 4",
+      horarioPrincipal: "Mixto",
+      semana: {
+        0:"Tarde", 1:"Noche", 2:"Noche", 3:"Descanso",
+        4:"Descanso", 5:"Mañana", 6:"Mañana"
+      }
+    }
+  };
+
+  const ICON = {
+    "Mañana":"🌅",
+    "Tarde":"🌇",
+    "Noche":"🌙",
+    "Descanso":"😴"
+  };
+
+  const CLASS = {
+    "Mañana":"morning",
+    "Tarde":"afternoon",
+    "Noche":"night",
+    "Descanso":"rest"
+  };
+
+  const monthNames = [
+    "Enero","Febrero","Marzo","Abril","Mayo","Junio",
+    "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+  ];
+
+  const calendar = document.getElementById("calendar");
+  const monthTitle = document.getElementById("monthTitle");
+  const modal = document.getElementById("modal");
+  let viewDate = new Date();
+
+  function normalize(date){
+    const d = new Date(date);
+    d.setHours(12,0,0,0);
+    return d;
+  }
+
+  function diffDays(a,b){
+    return Math.round((normalize(a)-normalize(b))/MS_DAY);
+  }
+
+  function mod(n,m){
+    return ((n % m) + m) % m;
+  }
+
+  function getShiftData(date){
+    const d = normalize(date);
+    const days = diffDays(d, BASE_DATE);
+    const block = Math.floor(days / 28);
+    const dayInBlock = mod(days, 28);
+    const turno = mod(block, 4) + 1;
+    let horario = TURNOS[turno].semana[d.getDay()];
+
+    // En el primer día del bloque se entra a cubrir el nuevo turno.
+    // Esto hace que el domingo inicial del Turno 2 sea trabajado por la tarde.
+    if(dayInBlock === 0){
+      if(turno === 1) horario = "Mañana";
+      if(turno === 2) horario = "Tarde";
+      if(turno === 3) horario = "Noche";
+      if(turno === 4) horario = "Tarde";
+    }
+
+    return {
+      turno,
+      horario,
+      trabaja: horario !== "Descanso",
+      dayInBlock,
+      blockStart: addDays(d, -dayInBlock),
+      nextChange: addDays(d, 28 - dayInBlock)
+    };
+  }
+
+  function addDays(date, amount){
+    const d = normalize(date);
+    d.setDate(d.getDate()+amount);
+    return d;
+  }
+
+  function nextRest(date){
+    for(let i=0;i<40;i++){
+      const d = addDays(date,i);
+      if(getShiftData(d).horario === "Descanso") return d;
+    }
+    return null;
+  }
+
+  function sameDate(a,b){
+    return a.getFullYear()===b.getFullYear() &&
+           a.getMonth()===b.getMonth() &&
+           a.getDate()===b.getDate();
+  }
+
+  function formatLong(date){
+    return new Intl.DateTimeFormat("es-MX",{
+      weekday:"long", day:"numeric", month:"long", year:"numeric"
+    }).format(date);
+  }
+
+  function formatShort(date){
+    return new Intl.DateTimeFormat("es-MX",{
+      day:"numeric", month:"short", year:"numeric"
+    }).format(date);
+  }
+
+  function daysUntil(from,to){
+    return diffDays(to,from);
+  }
+
+  function renderCalendar(){
+    calendar.innerHTML="";
+    const year=viewDate.getFullYear();
+    const month=viewDate.getMonth();
+    monthTitle.textContent=`${monthNames[month]} ${year}`;
+
+    const first = new Date(year,month,1);
+    const offset = (first.getDay()+6)%7;
+    const start = addDays(first,-offset);
+    const today = normalize(new Date());
+
+    for(let i=0;i<42;i++){
+      const date = addDays(start,i);
+      const info = getShiftData(date);
+      const cell = document.createElement("div");
+      cell.className = "day";
+      if(date.getMonth()!==month) cell.classList.add("outside");
+      if(sameDate(date,today)) cell.classList.add("today");
+
+      cell.innerHTML = `
+        <div class="day-number">${date.getDate()}</div>
+        <div class="event ${CLASS[info.horario]}">
+          ${ICON[info.horario]} T${info.turno}<br>${info.horario}
+        </div>
+      `;
+      cell.addEventListener("click",()=>openDetails(date));
+      calendar.appendChild(cell);
+    }
+  }
+
+  function renderToday(){
+    const today = normalize(new Date());
+    const info = getShiftData(today);
+    const rest = nextRest(today);
+
+    document.getElementById("todayBadge").className = `badge ${CLASS[info.horario]}`;
+    document.getElementById("todayBadge").textContent = ICON[info.horario];
+    document.getElementById("todayTitle").textContent =
+      info.trabaja ? `${TURNOS[info.turno].nombre} · ${info.horario}` : `${TURNOS[info.turno].nombre} · Descanso`;
+    document.getElementById("todayMeta").textContent = formatLong(today);
+    document.getElementById("nextRest").textContent =
+      rest ? `Próximo descanso: ${formatShort(rest)} (${daysUntil(today,rest)} días)` : "";
+    document.getElementById("nextChange").textContent =
+      `Próximo cambio: ${formatShort(info.nextChange)} (${daysUntil(today,info.nextChange)} días)`;
+  }
+
+  function describe(date){
+    const info = getShiftData(date);
+    return `${formatLong(date)}: ${TURNOS[info.turno].nombre}, ${info.horario}.`;
+  }
+
+  function openDetails(date){
+    const info = getShiftData(date);
+    const rest = nextRest(date);
+
+    document.getElementById("modalDate").textContent = formatLong(date);
+    document.getElementById("modalStatus").textContent =
+      info.trabaja ? "Día de trabajo" : "Día de descanso";
+    document.getElementById("modalShift").textContent = TURNOS[info.turno].nombre;
+    document.getElementById("modalSchedule").textContent = `${ICON[info.horario]} ${info.horario}`;
+    document.getElementById("modalRest").textContent = rest ? formatShort(rest) : "—";
+    document.getElementById("modalChange").textContent = formatShort(info.nextChange);
+    modal.classList.add("show");
+  }
+
+  document.getElementById("prevBtn").onclick=()=>{
+    viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);
+    renderCalendar();
+  };
+  document.getElementById("nextBtn").onclick=()=>{
+    viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);
+    renderCalendar();
+  };
+  document.getElementById("todayBtn").onclick=()=>{
+    viewDate=new Date();
+    renderCalendar();
+  };
+  document.getElementById("searchBtn").onclick=()=>{
+    const value=document.getElementById("dateSearch").value;
+    const result=document.getElementById("searchResult");
+    if(!value){
+      result.textContent="Selecciona una fecha.";
+      return;
+    }
+    const [y,m,d]=value.split("-").map(Number);
+    const date=new Date(y,m-1,d,12);
+    result.textContent=describe(date);
+    viewDate=new Date(y,m-1,1);
+    renderCalendar();
+  };
+  document.getElementById("closeModal").onclick=()=>modal.classList.remove("show");
+  modal.addEventListener("click",(e)=>{
+    if(e.target===modal) modal.classList.remove("show");
+  });
+
+  renderToday();
+  renderCalendar();
+})();
+</script>
+</body>
+</html>
