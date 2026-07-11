@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mis Turnos</title>
+  <meta name="theme-color" content="#6d4aff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Mis Turnos" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
   <style>
     :root{
       --bg:#f5f7fb;
@@ -233,7 +239,10 @@
         <h1>Mis Turnos</h1>
         <div class="subtitle">Calendario automático de 4 turnos</div>
       </div>
-      <button id="todayBtn">Ir a hoy</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="settingsBtn" class="secondary">⚙️ Configurar</button>
+        <button id="todayBtn">Ir a hoy</button>
+      </div>
     </div>
 
     <section class="grid-top">
@@ -309,8 +318,11 @@
 
   // FECHA BASE CONFIRMADA:
   // 14 de junio de 2026 = inicio del Turno 1.
-  const BASE_DATE = new Date(2026, 5, 14);
-  BASE_DATE.setHours(12,0,0,0);
+  const savedBaseDate = localStorage.getItem("misTurnos.baseDate") || "2026-06-14";
+  const savedBaseShift = Number(localStorage.getItem("misTurnos.baseShift") || "1");
+  const [baseY, baseM, baseD] = savedBaseDate.split("-").map(Number);
+  let BASE_DATE = new Date(baseY, baseM - 1, baseD, 12);
+  let BASE_SHIFT = savedBaseShift;
 
   const TURNOS = {
     1: {
@@ -390,7 +402,7 @@
     const days = diffDays(d, BASE_DATE);
     const block = Math.floor(days / 28);
     const dayInBlock = mod(days, 28);
-    const turno = mod(block, 4) + 1;
+    const turno = mod((BASE_SHIFT - 1) + block, 4) + 1;
     let horario = TURNOS[turno].semana[d.getDay()];
 
     // En el primer día del bloque se entra a cubrir el nuevo turno.
@@ -543,9 +555,70 @@
     if(e.target===modal) modal.classList.remove("show");
   });
 
+  const settingsModal = document.getElementById("settingsModal");
+  document.getElementById("settingsBtn").onclick = () => {
+    document.getElementById("baseDateInput").value =
+      `${BASE_DATE.getFullYear()}-${String(BASE_DATE.getMonth()+1).padStart(2,"0")}-${String(BASE_DATE.getDate()).padStart(2,"0")}`;
+    document.getElementById("baseShiftInput").value = String(BASE_SHIFT);
+    settingsModal.classList.add("show");
+  };
+  document.getElementById("closeSettings").onclick = () => settingsModal.classList.remove("show");
+  settingsModal.addEventListener("click", e => {
+    if (e.target === settingsModal) settingsModal.classList.remove("show");
+  });
+  document.getElementById("saveSettings").onclick = () => {
+    const dateValue = document.getElementById("baseDateInput").value;
+    const shiftValue = Number(document.getElementById("baseShiftInput").value);
+    if (!dateValue) return;
+    localStorage.setItem("misTurnos.baseDate", dateValue);
+    localStorage.setItem("misTurnos.baseShift", String(shiftValue));
+    const [y,m,d] = dateValue.split("-").map(Number);
+    BASE_DATE = new Date(y,m-1,d,12);
+    BASE_SHIFT = shiftValue;
+    settingsModal.classList.remove("show");
+    renderToday();
+    renderCalendar();
+  };
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+    });
+  }
+
   renderToday();
   renderCalendar();
 })();
 </script>
+
+  <div id="settingsModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-top">
+        <div>
+          <h2 style="margin:0">Configuración</h2>
+          <div class="meta">Ajusta una fecha conocida y el turno que comenzó ese día.</div>
+        </div>
+        <button id="closeSettings" class="close">✕</button>
+      </div>
+      <div style="display:grid;gap:12px;margin-top:16px">
+        <label>
+          <small style="display:block;color:var(--muted);margin-bottom:5px">Fecha base</small>
+          <input id="baseDateInput" type="date" style="width:100%;border:1px solid var(--line);padding:11px;border-radius:12px">
+        </label>
+        <label>
+          <small style="display:block;color:var(--muted);margin-bottom:5px">Turno que comenzó ese día</small>
+          <select id="baseShiftInput" style="width:100%;border:1px solid var(--line);padding:11px;border-radius:12px;background:white;font:inherit">
+            <option value="1">Turno 1</option>
+            <option value="2">Turno 2</option>
+            <option value="3">Turno 3</option>
+            <option value="4">Turno 4</option>
+          </select>
+        </label>
+        <div class="meta">Valor inicial: 14 de junio de 2026, Turno 1. Cada turno dura 28 días.</div>
+        <button id="saveSettings">Guardar configuración</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

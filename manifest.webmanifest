@@ -1,0 +1,22 @@
+{
+  "name": "Mis Turnos",
+  "short_name": "Mis Turnos",
+  "description": "Calendario automático de cuatro turnos de trabajo.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f7fb",
+  "theme_color": "#6d4aff",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
