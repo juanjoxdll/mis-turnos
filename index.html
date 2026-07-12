@@ -95,7 +95,7 @@
 <main class="app">
   <header class="topbar">
     <div class="brand">
-      <div style="display:flex;align-items:center;gap:9px"><h1>Mis Turnos</h1><span class="version">v1.1</span></div>
+      <div style="display:flex;align-items:center;gap:9px"><h1>Mis Turnos</h1><span class="version">v1.2</span></div>
       <p>Tu calendario automático de cuatro turnos</p>
     </div>
     <div class="actions">
@@ -182,7 +182,7 @@
           <option value="3">Turno 3</option><option value="4">Turno 4</option>
         </select>
       </label>
-      <div class="muted">Cada turno se calcula en bloques de 28 días. Valor inicial: 14/06/2026, Turno 1.</div>
+      <div class="muted">Cada turno se calcula en bloques de 28 días. Valor inicial corregido: 15/06/2026, Turno 1. Los cambios de turno ocurren cada 28 días en lunes.</div>
       <button id="saveSettings">Guardar cambios</button>
     </div>
   </div>
@@ -201,7 +201,17 @@
   const CLS={Mañana:"morning",Tarde:"afternoon",Noche:"night",Descanso:"rest"};
   const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
-  let baseString=localStorage.getItem("mt.baseDate")||"2026-06-14";
+  const CONFIG_VERSION="1.2";
+  const savedVersion=localStorage.getItem("mt.configVersion");
+  const savedBase=localStorage.getItem("mt.baseDate");
+  const savedShift=localStorage.getItem("mt.baseShift");
+  // Migra únicamente la configuración predeterminada de v1.1; conserva ajustes personales.
+  if(savedVersion!==CONFIG_VERSION && (!savedBase || (savedBase==="2026-06-14" && (!savedShift || savedShift==="1")))){
+    localStorage.setItem("mt.baseDate","2026-06-15");
+    localStorage.setItem("mt.baseShift","1");
+  }
+  localStorage.setItem("mt.configVersion",CONFIG_VERSION);
+  let baseString=localStorage.getItem("mt.baseDate")||"2026-06-15";
   let baseShift=Number(localStorage.getItem("mt.baseShift")||1);
   let [by,bm,bd]=baseString.split("-").map(Number);
   let baseDate=new Date(by,bm-1,bd,12);
