@@ -1,7 +1,7 @@
 {
   "name": "Mis Turnos",
   "short_name": "Mis Turnos",
-  "description": "Calendario automático de cuatro turnos de trabajo.",
+  "description": "Mis Turnos 🟢 v2.5 Stable",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
