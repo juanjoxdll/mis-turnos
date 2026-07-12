@@ -88,7 +88,7 @@
     .bottom-nav button.active{color:var(--primary);background:color-mix(in srgb,var(--primary) 10%,var(--card))}
     @media(max-width:780px){
       body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
-      .app{padding:10px 8px 18px}.topbar{margin-bottom:10px}.brand h1{font-size:30px}.brand p{font-size:13px}
+      .app{padding:calc(10px + env(safe-area-inset-top)) 8px 18px}.topbar{margin-bottom:10px}.brand h1{font-size:30px}.brand p{font-size:13px}
       .actions #settingsBtn,.actions #todayBtn{display:none}.actions{margin-left:auto}.actions button{padding:9px 11px;font-size:0}.actions #themeBtn::first-letter{font-size:19px}
       .hero{grid-template-columns:1fr;gap:10px}.card{border-radius:18px;padding:14px}.today-main{gap:12px}.icon{width:62px;height:62px;border-radius:19px;font-size:29px}.today-title{font-size:22px}
       .facts{grid-template-columns:repeat(3,1fr);gap:6px;margin-top:13px}.fact{padding:9px 7px;border-radius:12px}.fact small{font-size:10px}.fact strong{font-size:11px;line-height:1.25;display:block}
@@ -103,7 +103,7 @@
 <main class="app">
   <header class="topbar">
     <div class="brand">
-      <div style="display:flex;align-items:center;gap:9px"><h1>Mis Turnos</h1><span class="version">v1.3.1</span></div>
+      <div style="display:flex;align-items:center;gap:9px"><h1>Mis Turnos</h1><span class="version">v1.3.2</span></div>
       <p>Tu calendario automático de cuatro turnos</p>
     </div>
     <div class="actions">
@@ -215,7 +215,7 @@
   const CLS={Mañana:"morning",Tarde:"afternoon",Noche:"night",Descanso:"rest"};
   const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
-  const CONFIG_VERSION="1.3.1";
+  const CONFIG_VERSION="1.3.2";
   const savedVersion=localStorage.getItem("mt.configVersion");
   const savedBase=localStorage.getItem("mt.baseDate");
   const savedShift=localStorage.getItem("mt.baseShift");
@@ -271,7 +271,7 @@
     for(let i=0;i<42;i++){
       const d=add(start,i),x=info(d),cell=document.createElement("div");
       cell.className="day"+(d.getMonth()!==m?" out":"")+(same(d,today)?" today":"");
-      cell.innerHTML=`<div class="num">${d.getDate()}</div><div class="event ${CLS[x.horario]}">${ICON[x.horario]} T${x.turno}<br>${x.horario}</div>`;
+      cell.innerHTML=`<div class="num">${d.getDate()}</div><div class="event ${CLS[x.horario]}" title="${x.horario}">${ICON[x.horario]} T${x.turno}</div>`;
       cell.onclick=()=>openDetails(d);$("calendar").appendChild(cell);
     }
   }
