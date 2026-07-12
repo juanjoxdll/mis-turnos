@@ -319,7 +319,11 @@
     for(let i=0;i<42;i++){
       const d=add(start,i),x=info(d),cell=document.createElement("div");
       cell.className="day"+(d.getMonth()!==m?" out":"")+(same(d,today)?" today":"");
-      cell.innerHTML = `<div class="num">${d.getDate()}</div><div class="event ${CLS[x.horario]}">${ICON[x.horario]} T${x.turno}</div>`;<br>${x.horario}</div>`;
+      cell.innerHTML = `
+<div class="num">${d.getDate()}</div>
+<div class="event ${CLS[x.horario]}">
+    ${ICON[x.horario]} T${x.turno}
+</div>`;;<br>${x.horario}</div>`;
       cell.onclick=()=>openDetails(d);$("calendar").appendChild(cell);
     }
   }
