@@ -103,7 +103,7 @@
 <main class="app">
   <header class="topbar">
     <div class="brand">
-      <div style="display:flex;align-items:center;gap:9px"><h1>Mis Turnos</h1><span class="version">v1.5</span></div>
+      <div style="display:flex;align-items:center;gap:9px"><h1>Mis Turnos</h1><span class="version">v1.5.1</span></div>
       <p>Tu calendario automático de cuatro turnos</p>
     </div>
     <div class="actions">
@@ -215,7 +215,7 @@
   const CLS={Mañana:"morning",Tarde:"afternoon",Noche:"night",Descanso:"rest"};
   const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
-  const CONFIG_VERSION="1.5";
+  const CONFIG_VERSION="1.5.1";
   const savedVersion=localStorage.getItem("mt.configVersion");
   const savedBase=localStorage.getItem("mt.baseDate");
   const savedShift=localStorage.getItem("mt.baseShift");
@@ -253,8 +253,7 @@
     while(index<3&&cycleDay>=STARTS[index+1])index++;
     const turno=index+1,dayIn=cycleDay-STARTS[index],daysToChange=STARTS[index+1]-cycleDay;
     let horario=TURNOS[turno].days[d.getDay()];
-    // Se descansa antes de la transición y al día siguiente se cubre el turno nuevo.
-    if(daysToChange===1)horario="Descanso";
+    // El primer día se trabaja el turno nuevo, aunque su patrón normal marque descanso.
     if(dayIn===0)horario=ENTRY[turno];
     return {turno,horario,trabaja:horario!=="Descanso",dayIn,nextChange:add(d,daysToChange)};
   }
