@@ -1,624 +1,295 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Mis Turnos</title>
-  <meta name="theme-color" content="#6d4aff" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Mis Turnos" />
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <meta name="theme-color" content="#6558f5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Mis Turnos">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icon-192.png">
   <style>
     :root{
-      --bg:#f5f7fb;
-      --card:#ffffff;
-      --text:#172033;
-      --muted:#6b7280;
-      --line:#e5e7eb;
-      --primary:#6d4aff;
-      --morning:#dbeeff;
-      --afternoon:#fff0cf;
-      --night:#eadfff;
-      --rest:#dff7ee;
-      --today:#6d4aff;
+      --bg:#f5f7fb;--card:#fff;--text:#182033;--muted:#697386;--line:#e6e9f0;
+      --primary:#6558f5;--primary2:#8478ff;--shadow:0 12px 34px rgba(29,37,59,.08);
+      --morning:#dceeff;--afternoon:#fff0c9;--night:#eadfff;--rest:#dcf7ec;
+      --morningText:#245f92;--afternoonText:#8b6500;--nightText:#6344a2;--restText:#287557;
+    }
+    [data-theme="dark"]{
+      --bg:#111522;--card:#1a2030;--text:#f4f6fb;--muted:#aab3c5;--line:#2d3548;
+      --shadow:0 12px 34px rgba(0,0,0,.24);
+      --morning:#193650;--afternoon:#4a3c18;--night:#34284f;--rest:#173b31;
+      --morningText:#9bd0ff;--afternoonText:#ffdb7b;--nightText:#c9b2ff;--restText:#91e4c5;
     }
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-    .app{
-      width:min(1100px,100%);
-      margin:auto;
-      padding:18px;
-    }
-    .topbar{
-      display:flex;
-      gap:14px;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:18px;
-      flex-wrap:wrap;
-    }
-    h1{margin:0;font-size:clamp(28px,4vw,42px)}
-    .subtitle{color:var(--muted);margin-top:4px}
-    button,input{
-      font:inherit;
-    }
-    button{
-      border:0;
-      border-radius:12px;
-      padding:10px 14px;
-      cursor:pointer;
-      background:#111827;
-      color:white;
-    }
-    button.secondary{
-      background:white;
-      color:var(--text);
-      border:1px solid var(--line);
-    }
-    .grid-top{
-      display:grid;
-      grid-template-columns:1.1fr .9fr;
-      gap:16px;
-      margin-bottom:16px;
-    }
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:18px;
-      box-shadow:0 8px 24px rgba(15,23,42,.05);
-    }
-    .today-main{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      flex-wrap:wrap;
-    }
-    .badge{
-      width:64px;height:64px;border-radius:18px;
-      display:grid;place-items:center;
-      font-size:30px;
-    }
-    .today-title{font-size:24px;font-weight:800}
-    .meta{color:var(--muted);margin-top:4px}
-    .statline{
-      margin-top:14px;
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-    .pill{
-      padding:8px 10px;
-      border-radius:999px;
-      background:#f3f4f6;
-      font-size:14px;
-    }
-    .search{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .search input{
-      flex:1;
-      min-width:190px;
-      border:1px solid var(--line);
-      padding:11px 12px;
-      border-radius:12px;
-      background:white;
-      color:var(--text);
-    }
-    .search-result{
-      margin-top:14px;
-      padding:12px;
-      border-radius:12px;
-      background:#f8fafc;
-      min-height:48px;
-    }
+    html{background:var(--bg)}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    button,input,select{font:inherit}
+    button{border:0;border-radius:13px;padding:10px 14px;cursor:pointer;background:var(--primary);color:#fff;font-weight:700}
+    button.secondary{background:var(--card);color:var(--text);border:1px solid var(--line)}
+    .app{width:min(1120px,100%);margin:auto;padding:16px 16px calc(26px + env(safe-area-inset-bottom))}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:6px 0 16px}
+    .brand h1{margin:0;font-size:clamp(28px,5vw,44px);letter-spacing:-.04em}
+    .brand p{margin:4px 0 0;color:var(--muted)}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .version{font-size:12px;padding:5px 8px;border-radius:999px;background:rgba(101,88,245,.12);color:var(--primary)}
+    .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-bottom:16px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:21px;padding:18px;box-shadow:var(--shadow)}
+    .today{position:relative;overflow:hidden}
+    .today:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-70px;top:-85px;background:linear-gradient(135deg,var(--primary),var(--primary2));opacity:.12}
+    .today-main{display:flex;gap:14px;align-items:center;position:relative;z-index:1}
+    .icon{width:72px;height:72px;border-radius:21px;display:grid;place-items:center;font-size:34px}
+    .today-title{font-size:clamp(22px,4vw,31px);font-weight:850;letter-spacing:-.03em}
+    .muted{color:var(--muted)}
+    .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;position:relative;z-index:1}
+    .fact{border:1px solid var(--line);border-radius:15px;padding:12px;background:color-mix(in srgb,var(--card) 90%,var(--bg))}
+    .fact small{display:block;color:var(--muted);margin-bottom:5px}
+    .fact strong{font-size:14px}
+    .search-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+    input,select{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:12px;padding:11px 12px}
+    .search-row input{flex:1;min-width:170px}
+    .result{margin-top:12px;border-radius:14px;padding:12px;background:var(--bg);min-height:48px}
     .calendar-card{padding:0;overflow:hidden}
-    .calendar-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding:16px;
-      border-bottom:1px solid var(--line);
-      flex-wrap:wrap;
-    }
-    .calendar-header h2{margin:0;font-size:24px}
+    .calendar-head{padding:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+    .calendar-head h2{margin:0;font-size:24px}
     .nav{display:flex;gap:8px}
-    .weekdays,.calendar{
-      display:grid;
-      grid-template-columns:repeat(7,1fr);
-    }
-    .weekdays{
-      background:#fafafa;
-      border-bottom:1px solid var(--line);
-    }
-    .weekdays div{
-      padding:12px 6px;
-      text-align:center;
-      font-size:13px;
-      color:var(--muted);
-      font-weight:700;
-    }
-    .day{
-      min-height:118px;
-      border-right:1px solid var(--line);
-      border-bottom:1px solid var(--line);
-      padding:9px;
-      background:white;
-      cursor:pointer;
-      transition:.15s ease;
-    }
-    .day:hover{transform:translateY(-1px);box-shadow:inset 0 0 0 2px rgba(109,74,255,.15)}
+    .weekdays,.calendar{display:grid;grid-template-columns:repeat(7,1fr)}
+    .weekdays{background:color-mix(in srgb,var(--card) 85%,var(--bg));border-bottom:1px solid var(--line)}
+    .weekdays div{text-align:center;padding:11px 4px;font-size:12px;color:var(--muted);font-weight:800}
+    .day{min-height:116px;padding:8px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--card);cursor:pointer;transition:.15s}
     .day:nth-child(7n){border-right:0}
-    .day.outside{background:#fafafa;color:#9ca3af}
-    .day-number{
-      width:30px;height:30px;border-radius:50%;
-      display:grid;place-items:center;
-      font-weight:700;
-      margin-bottom:9px;
-    }
-    .day.today .day-number{
-      background:var(--today);color:white;
-    }
-    .event{
-      border-radius:8px;
-      padding:6px 7px;
-      font-size:12px;
-      font-weight:700;
-      line-height:1.25;
-    }
-    .morning{background:var(--morning)}
-    .afternoon{background:var(--afternoon)}
-    .night{background:var(--night)}
-    .rest{background:var(--rest)}
-    .legend{
-      display:flex;gap:10px;flex-wrap:wrap;
-      margin-top:14px;
-      color:var(--muted);
-      font-size:14px;
-    }
-    .legend span{
-      padding:7px 10px;border-radius:999px;color:var(--text);
-    }
-    .modal{
-      position:fixed;inset:0;
-      background:rgba(15,23,42,.45);
-      display:none;
-      place-items:center;
-      padding:16px;
-      z-index:20;
-    }
+    .day:hover{box-shadow:inset 0 0 0 2px rgba(101,88,245,.18)}
+    .day.out{opacity:.4}
+    .num{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;font-weight:800;margin-bottom:8px}
+    .day.today .num{background:var(--primary);color:#fff}
+    .event{border-radius:10px;padding:7px;font-size:12px;font-weight:800;line-height:1.25}
+    .morning{background:var(--morning);color:var(--morningText)}
+    .afternoon{background:var(--afternoon);color:var(--afternoonText)}
+    .night{background:var(--night);color:var(--nightText)}
+    .rest{background:var(--rest);color:var(--restText)}
+    .legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .legend span{padding:7px 10px;border-radius:999px;font-size:13px;font-weight:750}
+    .modal{position:fixed;inset:0;background:rgba(10,14,24,.55);display:none;place-items:center;padding:16px;z-index:50}
     .modal.show{display:grid}
-    .modal-box{
-      width:min(430px,100%);
-      background:white;border-radius:20px;padding:20px;
-      box-shadow:0 24px 60px rgba(15,23,42,.25);
-    }
-    .modal-top{
-      display:flex;justify-content:space-between;gap:12px;align-items:start;
-    }
-    .close{
-      background:#f3f4f6;color:#111827;
-      width:38px;height:38px;padding:0;
-      border-radius:50%;
-    }
-    .detail-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:10px;
-      margin-top:16px;
-    }
-    .detail{
-      padding:12px;border-radius:12px;background:#f8fafc;
-    }
-    .detail small{color:var(--muted);display:block;margin-bottom:4px}
-    @media(max-width:760px){
-      .grid-top{grid-template-columns:1fr}
-      .app{padding:10px}
-      .day{min-height:78px;padding:6px}
-      .event{font-size:10px;padding:5px}
-      .weekdays div{font-size:11px}
-      .calendar-header h2{font-size:20px}
-      .detail-grid{grid-template-columns:1fr}
+    .modal-box{width:min(460px,100%);background:var(--card);border:1px solid var(--line);border-radius:23px;padding:20px;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+    .modal-top{display:flex;justify-content:space-between;align-items:start;gap:12px}
+    .close{width:38px;height:38px;padding:0;border-radius:50%;background:var(--bg);color:var(--text)}
+    .details{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+    .detail{padding:12px;border-radius:14px;background:var(--bg)}
+    .detail small{display:block;color:var(--muted);margin-bottom:5px}
+    .settings{display:grid;gap:12px;margin-top:16px}
+    .settings label small{display:block;color:var(--muted);margin-bottom:5px}
+    .settings input,.settings select{width:100%}
+    @media(max-width:780px){
+      .hero{grid-template-columns:1fr}.facts{grid-template-columns:1fr}
+      .day{min-height:82px;padding:5px}.event{font-size:10px;padding:5px}
+      .app{padding:10px 8px calc(20px + env(safe-area-inset-bottom))}
+      .calendar-head h2{font-size:20px}.details{grid-template-columns:1fr}
+      .brand p{font-size:14px}
     }
   </style>
 </head>
 <body>
-  <main class="app">
-    <div class="topbar">
-      <div>
-        <h1>Mis Turnos</h1>
-        <div class="subtitle">Calendario automático de 4 turnos</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button id="settingsBtn" class="secondary">⚙️ Configurar</button>
-        <button id="todayBtn">Ir a hoy</button>
-      </div>
+<main class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div style="display:flex;align-items:center;gap:9px"><h1>Mis Turnos</h1><span class="version">v1.1</span></div>
+      <p>Tu calendario automático de cuatro turnos</p>
     </div>
-
-    <section class="grid-top">
-      <article class="card">
-        <div class="today-main">
-          <div id="todayBadge" class="badge"></div>
-          <div>
-            <div id="todayTitle" class="today-title">Cargando...</div>
-            <div id="todayMeta" class="meta"></div>
-          </div>
-        </div>
-        <div class="statline">
-          <div id="nextRest" class="pill"></div>
-          <div id="nextChange" class="pill"></div>
-        </div>
-      </article>
-
-      <article class="card">
-        <strong>Buscar una fecha</strong>
-        <div class="search" style="margin-top:10px">
-          <input id="dateSearch" type="date" />
-          <button id="searchBtn">Consultar</button>
-        </div>
-        <div id="searchResult" class="search-result">Selecciona una fecha.</div>
-      </article>
-    </section>
-
-    <section class="card calendar-card">
-      <div class="calendar-header">
-        <h2 id="monthTitle"></h2>
-        <div class="nav">
-          <button id="prevBtn" class="secondary">←</button>
-          <button id="nextBtn" class="secondary">→</button>
-        </div>
-      </div>
-
-      <div class="weekdays">
-        <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div>
-        <div>Vie</div><div>Sáb</div><div>Dom</div>
-      </div>
-      <div id="calendar" class="calendar"></div>
-    </section>
-
-    <div class="legend">
-      <span class="morning">🌅 Mañana</span>
-      <span class="afternoon">🌇 Tarde</span>
-      <span class="night">🌙 Noche</span>
-      <span class="rest">😴 Descanso</span>
+    <div class="actions">
+      <button id="themeBtn" class="secondary">🌙 Modo oscuro</button>
+      <button id="settingsBtn" class="secondary">⚙️ Configurar</button>
+      <button id="todayBtn">Hoy</button>
     </div>
-  </main>
+  </header>
 
-  <div id="modal" class="modal">
-    <div class="modal-box">
-      <div class="modal-top">
+  <section class="hero">
+    <article class="card today">
+      <div class="today-main">
+        <div id="todayIcon" class="icon"></div>
         <div>
-          <h2 id="modalDate" style="margin:0"></h2>
-          <div id="modalStatus" class="meta"></div>
+          <div id="todayTitle" class="today-title">Cargando…</div>
+          <div id="todayDate" class="muted"></div>
         </div>
-        <button id="closeModal" class="close">✕</button>
       </div>
-      <div class="detail-grid">
-        <div class="detail"><small>Turno</small><strong id="modalShift"></strong></div>
-        <div class="detail"><small>Horario</small><strong id="modalSchedule"></strong></div>
-        <div class="detail"><small>Próximo descanso</small><strong id="modalRest"></strong></div>
-        <div class="detail"><small>Próximo cambio</small><strong id="modalChange"></strong></div>
+      <div class="facts">
+        <div class="fact"><small>Estado</small><strong id="todayStatus"></strong></div>
+        <div class="fact"><small>Próximo descanso</small><strong id="nextRest"></strong></div>
+        <div class="fact"><small>Próximo cambio</small><strong id="nextChange"></strong></div>
       </div>
+    </article>
+
+    <article class="card">
+      <strong>Consultar una fecha</strong>
+      <div class="search-row">
+        <input id="dateSearch" type="date">
+        <button id="searchBtn">Buscar</button>
+      </div>
+      <div id="searchResult" class="result">Selecciona una fecha para consultar tu turno.</div>
+    </article>
+  </section>
+
+  <section class="card calendar-card">
+    <div class="calendar-head">
+      <h2 id="monthTitle"></h2>
+      <div class="nav">
+        <button id="prevBtn" class="secondary">←</button>
+        <button id="nextBtn" class="secondary">→</button>
+      </div>
+    </div>
+    <div class="weekdays">
+      <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
+    </div>
+    <div id="calendar" class="calendar"></div>
+  </section>
+
+  <div class="legend">
+    <span class="morning">🌅 Mañana</span>
+    <span class="afternoon">🌇 Tarde</span>
+    <span class="night">🌙 Noche</span>
+    <span class="rest">😴 Descanso</span>
+  </div>
+</main>
+
+<div id="detailsModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <div><h2 id="detailDate" style="margin:0"></h2><div id="detailStatus" class="muted"></div></div>
+      <button id="closeDetails" class="close">✕</button>
+    </div>
+    <div class="details">
+      <div class="detail"><small>Turno</small><strong id="detailShift"></strong></div>
+      <div class="detail"><small>Horario</small><strong id="detailSchedule"></strong></div>
+      <div class="detail"><small>Próximo descanso</small><strong id="detailRest"></strong></div>
+      <div class="detail"><small>Próximo cambio</small><strong id="detailChange"></strong></div>
     </div>
   </div>
+</div>
+
+<div id="settingsModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <div><h2 style="margin:0">Configuración</h2><div class="muted">Usa una fecha en la que estés seguro de que comenzó un turno.</div></div>
+      <button id="closeSettings" class="close">✕</button>
+    </div>
+    <div class="settings">
+      <label><small>Fecha base</small><input id="baseDate" type="date"></label>
+      <label><small>Turno que comenzó ese día</small>
+        <select id="baseShift">
+          <option value="1">Turno 1</option><option value="2">Turno 2</option>
+          <option value="3">Turno 3</option><option value="4">Turno 4</option>
+        </select>
+      </label>
+      <div class="muted">Cada turno se calcula en bloques de 28 días. Valor inicial: 14/06/2026, Turno 1.</div>
+      <button id="saveSettings">Guardar cambios</button>
+    </div>
+  </div>
+</div>
 
 <script>
 (() => {
-  const MS_DAY = 86400000;
-
-  // FECHA BASE CONFIRMADA:
-  // 14 de junio de 2026 = inicio del Turno 1.
-  const savedBaseDate = localStorage.getItem("misTurnos.baseDate") || "2026-06-14";
-  const savedBaseShift = Number(localStorage.getItem("misTurnos.baseShift") || "1");
-  const [baseY, baseM, baseD] = savedBaseDate.split("-").map(Number);
-  let BASE_DATE = new Date(baseY, baseM - 1, baseD, 12);
-  let BASE_SHIFT = savedBaseShift;
-
+  const DAY = 86400000;
   const TURNOS = {
-    1: {
-      nombre: "Turno 1",
-      horarioPrincipal: "Mañana",
-      semana: {
-        0:"Mañana", 1:"Mañana", 2:"Mañana", 3:"Mañana",
-        4:"Mañana", 5:"Mañana", 6:"Descanso"
-      }
-    },
-    2: {
-      nombre: "Turno 2",
-      horarioPrincipal: "Tarde",
-      semana: {
-        0:"Descanso", 1:"Tarde", 2:"Tarde", 3:"Tarde",
-        4:"Tarde", 5:"Tarde", 6:"Tarde"
-      }
-    },
-    3: {
-      nombre: "Turno 3",
-      horarioPrincipal: "Noche",
-      semana: {
-        0:"Noche", 1:"Descanso", 2:"Descanso", 3:"Noche",
-        4:"Noche", 5:"Noche", 6:"Noche"
-      }
-    },
-    4: {
-      nombre: "Turno 4",
-      horarioPrincipal: "Mixto",
-      semana: {
-        0:"Tarde", 1:"Noche", 2:"Noche", 3:"Descanso",
-        4:"Descanso", 5:"Mañana", 6:"Mañana"
-      }
-    }
+    1:{name:"Turno 1",days:{0:"Mañana",1:"Mañana",2:"Mañana",3:"Mañana",4:"Mañana",5:"Mañana",6:"Descanso"}},
+    2:{name:"Turno 2",days:{0:"Descanso",1:"Tarde",2:"Tarde",3:"Tarde",4:"Tarde",5:"Tarde",6:"Tarde"}},
+    3:{name:"Turno 3",days:{0:"Noche",1:"Descanso",2:"Descanso",3:"Noche",4:"Noche",5:"Noche",6:"Noche"}},
+    4:{name:"Turno 4",days:{0:"Tarde",1:"Noche",2:"Noche",3:"Descanso",4:"Descanso",5:"Mañana",6:"Mañana"}}
   };
+  const ICON={Mañana:"🌅",Tarde:"🌇",Noche:"🌙",Descanso:"😴"};
+  const CLS={Mañana:"morning",Tarde:"afternoon",Noche:"night",Descanso:"rest"};
+  const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
-  const ICON = {
-    "Mañana":"🌅",
-    "Tarde":"🌇",
-    "Noche":"🌙",
-    "Descanso":"😴"
-  };
+  let baseString=localStorage.getItem("mt.baseDate")||"2026-06-14";
+  let baseShift=Number(localStorage.getItem("mt.baseShift")||1);
+  let [by,bm,bd]=baseString.split("-").map(Number);
+  let baseDate=new Date(by,bm-1,bd,12);
+  let viewDate=new Date();
 
-  const CLASS = {
-    "Mañana":"morning",
-    "Tarde":"afternoon",
-    "Noche":"night",
-    "Descanso":"rest"
-  };
+  const $=id=>document.getElementById(id);
+  const norm=d=>{const x=new Date(d);x.setHours(12,0,0,0);return x};
+  const add=(d,n)=>{const x=norm(d);x.setDate(x.getDate()+n);return x};
+  const diff=(a,b)=>Math.round((norm(a)-norm(b))/DAY);
+  const mod=(n,m)=>((n%m)+m)%m;
+  const same=(a,b)=>a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+  const long=d=>new Intl.DateTimeFormat("es-MX",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(d);
+  const short=d=>new Intl.DateTimeFormat("es-MX",{day:"numeric",month:"short",year:"numeric"}).format(d);
 
-  const monthNames = [
-    "Enero","Febrero","Marzo","Abril","Mayo","Junio",
-    "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
-  ];
-
-  const calendar = document.getElementById("calendar");
-  const monthTitle = document.getElementById("monthTitle");
-  const modal = document.getElementById("modal");
-  let viewDate = new Date();
-
-  function normalize(date){
-    const d = new Date(date);
-    d.setHours(12,0,0,0);
-    return d;
+  function info(date){
+    const d=norm(date), days=diff(d,baseDate), block=Math.floor(days/28), dayIn=mod(days,28);
+    const turno=mod((baseShift-1)+block,4)+1;
+    let horario=TURNOS[turno].days[d.getDay()];
+    // El primer día del bloque cubre inmediatamente el nuevo turno.
+    if(dayIn===0) horario=turno===1?"Mañana":turno===2?"Tarde":turno===3?"Noche":"Tarde";
+    return {turno,horario,trabaja:horario!=="Descanso",dayIn,nextChange:add(d,28-dayIn)};
   }
 
-  function diffDays(a,b){
-    return Math.round((normalize(a)-normalize(b))/MS_DAY);
-  }
-
-  function mod(n,m){
-    return ((n % m) + m) % m;
-  }
-
-  function getShiftData(date){
-    const d = normalize(date);
-    const days = diffDays(d, BASE_DATE);
-    const block = Math.floor(days / 28);
-    const dayInBlock = mod(days, 28);
-    const turno = mod((BASE_SHIFT - 1) + block, 4) + 1;
-    let horario = TURNOS[turno].semana[d.getDay()];
-
-    // En el primer día del bloque se entra a cubrir el nuevo turno.
-    // Esto hace que el domingo inicial del Turno 2 sea trabajado por la tarde.
-    if(dayInBlock === 0){
-      if(turno === 1) horario = "Mañana";
-      if(turno === 2) horario = "Tarde";
-      if(turno === 3) horario = "Noche";
-      if(turno === 4) horario = "Tarde";
-    }
-
-    return {
-      turno,
-      horario,
-      trabaja: horario !== "Descanso",
-      dayInBlock,
-      blockStart: addDays(d, -dayInBlock),
-      nextChange: addDays(d, 28 - dayInBlock)
-    };
-  }
-
-  function addDays(date, amount){
-    const d = normalize(date);
-    d.setDate(d.getDate()+amount);
-    return d;
-  }
-
-  function nextRest(date){
-    for(let i=0;i<40;i++){
-      const d = addDays(date,i);
-      if(getShiftData(d).horario === "Descanso") return d;
-    }
-    return null;
-  }
-
-  function sameDate(a,b){
-    return a.getFullYear()===b.getFullYear() &&
-           a.getMonth()===b.getMonth() &&
-           a.getDate()===b.getDate();
-  }
-
-  function formatLong(date){
-    return new Intl.DateTimeFormat("es-MX",{
-      weekday:"long", day:"numeric", month:"long", year:"numeric"
-    }).format(date);
-  }
-
-  function formatShort(date){
-    return new Intl.DateTimeFormat("es-MX",{
-      day:"numeric", month:"short", year:"numeric"
-    }).format(date);
-  }
-
-  function daysUntil(from,to){
-    return diffDays(to,from);
-  }
-
-  function renderCalendar(){
-    calendar.innerHTML="";
-    const year=viewDate.getFullYear();
-    const month=viewDate.getMonth();
-    monthTitle.textContent=`${monthNames[month]} ${year}`;
-
-    const first = new Date(year,month,1);
-    const offset = (first.getDay()+6)%7;
-    const start = addDays(first,-offset);
-    const today = normalize(new Date());
-
-    for(let i=0;i<42;i++){
-      const date = addDays(start,i);
-      const info = getShiftData(date);
-      const cell = document.createElement("div");
-      cell.className = "day";
-      if(date.getMonth()!==month) cell.classList.add("outside");
-      if(sameDate(date,today)) cell.classList.add("today");
-
-      cell.innerHTML = `
-        <div class="day-number">${date.getDate()}</div>
-        <div class="event ${CLASS[info.horario]}">
-          ${ICON[info.horario]} T${info.turno}<br>${info.horario}
-        </div>
-      `;
-      cell.addEventListener("click",()=>openDetails(date));
-      calendar.appendChild(cell);
-    }
+  function findRest(date){
+    for(let i=0;i<40;i++){const d=add(date,i);if(info(d).horario==="Descanso")return d}
   }
 
   function renderToday(){
-    const today = normalize(new Date());
-    const info = getShiftData(today);
-    const rest = nextRest(today);
-
-    document.getElementById("todayBadge").className = `badge ${CLASS[info.horario]}`;
-    document.getElementById("todayBadge").textContent = ICON[info.horario];
-    document.getElementById("todayTitle").textContent =
-      info.trabaja ? `${TURNOS[info.turno].nombre} · ${info.horario}` : `${TURNOS[info.turno].nombre} · Descanso`;
-    document.getElementById("todayMeta").textContent = formatLong(today);
-    document.getElementById("nextRest").textContent =
-      rest ? `Próximo descanso: ${formatShort(rest)} (${daysUntil(today,rest)} días)` : "";
-    document.getElementById("nextChange").textContent =
-      `Próximo cambio: ${formatShort(info.nextChange)} (${daysUntil(today,info.nextChange)} días)`;
+    const d=norm(new Date()), x=info(d), rest=findRest(d);
+    $("todayIcon").className=`icon ${CLS[x.horario]}`;$("todayIcon").textContent=ICON[x.horario];
+    $("todayTitle").textContent=`${TURNOS[x.turno].name} · ${x.horario}`;
+    $("todayDate").textContent=long(d);
+    $("todayStatus").textContent=x.trabaja?"Trabajas":"Descansas";
+    $("nextRest").textContent=`${short(rest)} · ${diff(rest,d)} días`;
+    $("nextChange").textContent=`${short(x.nextChange)} · ${diff(x.nextChange,d)} días`;
   }
 
-  function describe(date){
-    const info = getShiftData(date);
-    return `${formatLong(date)}: ${TURNOS[info.turno].nombre}, ${info.horario}.`;
-  }
-
-  function openDetails(date){
-    const info = getShiftData(date);
-    const rest = nextRest(date);
-
-    document.getElementById("modalDate").textContent = formatLong(date);
-    document.getElementById("modalStatus").textContent =
-      info.trabaja ? "Día de trabajo" : "Día de descanso";
-    document.getElementById("modalShift").textContent = TURNOS[info.turno].nombre;
-    document.getElementById("modalSchedule").textContent = `${ICON[info.horario]} ${info.horario}`;
-    document.getElementById("modalRest").textContent = rest ? formatShort(rest) : "—";
-    document.getElementById("modalChange").textContent = formatShort(info.nextChange);
-    modal.classList.add("show");
-  }
-
-  document.getElementById("prevBtn").onclick=()=>{
-    viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);
-    renderCalendar();
-  };
-  document.getElementById("nextBtn").onclick=()=>{
-    viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);
-    renderCalendar();
-  };
-  document.getElementById("todayBtn").onclick=()=>{
-    viewDate=new Date();
-    renderCalendar();
-  };
-  document.getElementById("searchBtn").onclick=()=>{
-    const value=document.getElementById("dateSearch").value;
-    const result=document.getElementById("searchResult");
-    if(!value){
-      result.textContent="Selecciona una fecha.";
-      return;
+  function renderCalendar(){
+    $("calendar").innerHTML="";
+    const y=viewDate.getFullYear(),m=viewDate.getMonth();
+    $("monthTitle").textContent=`${MONTHS[m]} ${y}`;
+    const first=new Date(y,m,1,12),offset=(first.getDay()+6)%7,start=add(first,-offset),today=norm(new Date());
+    for(let i=0;i<42;i++){
+      const d=add(start,i),x=info(d),cell=document.createElement("div");
+      cell.className="day"+(d.getMonth()!==m?" out":"")+(same(d,today)?" today":"");
+      cell.innerHTML=`<div class="num">${d.getDate()}</div><div class="event ${CLS[x.horario]}">${ICON[x.horario]} T${x.turno}<br>${x.horario}</div>`;
+      cell.onclick=()=>openDetails(d);$("calendar").appendChild(cell);
     }
-    const [y,m,d]=value.split("-").map(Number);
-    const date=new Date(y,m-1,d,12);
-    result.textContent=describe(date);
-    viewDate=new Date(y,m-1,1);
-    renderCalendar();
-  };
-  document.getElementById("closeModal").onclick=()=>modal.classList.remove("show");
-  modal.addEventListener("click",(e)=>{
-    if(e.target===modal) modal.classList.remove("show");
-  });
-
-  const settingsModal = document.getElementById("settingsModal");
-  document.getElementById("settingsBtn").onclick = () => {
-    document.getElementById("baseDateInput").value =
-      `${BASE_DATE.getFullYear()}-${String(BASE_DATE.getMonth()+1).padStart(2,"0")}-${String(BASE_DATE.getDate()).padStart(2,"0")}`;
-    document.getElementById("baseShiftInput").value = String(BASE_SHIFT);
-    settingsModal.classList.add("show");
-  };
-  document.getElementById("closeSettings").onclick = () => settingsModal.classList.remove("show");
-  settingsModal.addEventListener("click", e => {
-    if (e.target === settingsModal) settingsModal.classList.remove("show");
-  });
-  document.getElementById("saveSettings").onclick = () => {
-    const dateValue = document.getElementById("baseDateInput").value;
-    const shiftValue = Number(document.getElementById("baseShiftInput").value);
-    if (!dateValue) return;
-    localStorage.setItem("misTurnos.baseDate", dateValue);
-    localStorage.setItem("misTurnos.baseShift", String(shiftValue));
-    const [y,m,d] = dateValue.split("-").map(Number);
-    BASE_DATE = new Date(y,m-1,d,12);
-    BASE_SHIFT = shiftValue;
-    settingsModal.classList.remove("show");
-    renderToday();
-    renderCalendar();
-  };
-
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./service-worker.js").catch(() => {});
-    });
   }
 
-  renderToday();
-  renderCalendar();
+  function openDetails(d){
+    const x=info(d),rest=findRest(d);
+    $("detailDate").textContent=long(d);$("detailStatus").textContent=x.trabaja?"Día de trabajo":"Día de descanso";
+    $("detailShift").textContent=TURNOS[x.turno].name;$("detailSchedule").textContent=`${ICON[x.horario]} ${x.horario}`;
+    $("detailRest").textContent=short(rest);$("detailChange").textContent=short(x.nextChange);
+    $("detailsModal").classList.add("show");
+  }
+
+  $("prevBtn").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar()};
+  $("nextBtn").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar()};
+  $("todayBtn").onclick=()=>{viewDate=new Date();renderCalendar()};
+  $("searchBtn").onclick=()=>{
+    const v=$("dateSearch").value;if(!v)return;
+    const [y,m,d]=v.split("-").map(Number),date=new Date(y,m-1,d,12),x=info(date);
+    $("searchResult").textContent=`${long(date)}: ${TURNOS[x.turno].name}, ${x.horario}. ${x.trabaja?"Trabajas":"Descansas"}.`;
+    viewDate=new Date(y,m-1,1);renderCalendar();
+  };
+
+  $("closeDetails").onclick=()=>$("detailsModal").classList.remove("show");
+  $("detailsModal").onclick=e=>{if(e.target===$("detailsModal"))$("detailsModal").classList.remove("show")};
+  $("settingsBtn").onclick=()=>{$("baseDate").value=baseString;$("baseShift").value=String(baseShift);$("settingsModal").classList.add("show")};
+  $("closeSettings").onclick=()=>$("settingsModal").classList.remove("show");
+  $("settingsModal").onclick=e=>{if(e.target===$("settingsModal"))$("settingsModal").classList.remove("show")};
+  $("saveSettings").onclick=()=>{
+    baseString=$("baseDate").value;baseShift=Number($("baseShift").value);
+    if(!baseString)return;localStorage.setItem("mt.baseDate",baseString);localStorage.setItem("mt.baseShift",String(baseShift));
+    [by,bm,bd]=baseString.split("-").map(Number);baseDate=new Date(by,bm-1,bd,12);
+    $("settingsModal").classList.remove("show");renderToday();renderCalendar();
+  };
+
+  let theme=localStorage.getItem("mt.theme")||"light";
+  function applyTheme(){document.documentElement.dataset.theme=theme;$("themeBtn").textContent=theme==="dark"?"☀️ Modo claro":"🌙 Modo oscuro"}
+  $("themeBtn").onclick=()=>{theme=theme==="dark"?"light":"dark";localStorage.setItem("mt.theme",theme);applyTheme()};
+  applyTheme();
+
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
+  renderToday();renderCalendar();
 })();
 </script>
-
-  <div id="settingsModal" class="modal">
-    <div class="modal-box">
-      <div class="modal-top">
-        <div>
-          <h2 style="margin:0">Configuración</h2>
-          <div class="meta">Ajusta una fecha conocida y el turno que comenzó ese día.</div>
-        </div>
-        <button id="closeSettings" class="close">✕</button>
-      </div>
-      <div style="display:grid;gap:12px;margin-top:16px">
-        <label>
-          <small style="display:block;color:var(--muted);margin-bottom:5px">Fecha base</small>
-          <input id="baseDateInput" type="date" style="width:100%;border:1px solid var(--line);padding:11px;border-radius:12px">
-        </label>
-        <label>
-          <small style="display:block;color:var(--muted);margin-bottom:5px">Turno que comenzó ese día</small>
-          <select id="baseShiftInput" style="width:100%;border:1px solid var(--line);padding:11px;border-radius:12px;background:white;font:inherit">
-            <option value="1">Turno 1</option>
-            <option value="2">Turno 2</option>
-            <option value="3">Turno 3</option>
-            <option value="4">Turno 4</option>
-          </select>
-        </label>
-        <div class="meta">Valor inicial: 14 de junio de 2026, Turno 1. Cada turno dura 28 días.</div>
-        <button id="saveSettings">Guardar configuración</button>
-      </div>
-    </div>
-  </div>
-
 </body>
 </html>
