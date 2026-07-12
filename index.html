@@ -65,7 +65,7 @@
     .day.out{opacity:.4}
     .num{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;font-weight:800;margin-bottom:8px}
     .day.today .num{background:var(--primary);color:#fff}
-    .event{border-radius:10px;padding:7px;font-size:12px;font-weight:800;line-height:1.25}
+    .event{border-radius:10px;padding:6px;font-size:15px;font-weight:800;text-align:center}
     .morning{background:var(--morning);color:var(--morningText)}
     .afternoon{background:var(--afternoon);color:var(--afternoonText)}
     .night{background:var(--night);color:var(--nightText)}
@@ -103,7 +103,7 @@
 <main class="app">
   <header class="topbar">
     <div class="brand">
-      <div style="display:flex;align-items:center;gap:9px"><h1>Mis Turnos</h1><span class="version">🟢 v2.0.4 Stable</span></div>
+      <div style="display:flex;align-items:center;gap:9px"><h1>Mis Turnos</h1><span class="version">v2.0.4</span></div>
       <p>Tu calendario automático de cuatro turnos</p>
     </div>
     <div class="actions">
@@ -319,11 +319,7 @@
     for(let i=0;i<42;i++){
       const d=add(start,i),x=info(d),cell=document.createElement("div");
       cell.className="day"+(d.getMonth()!==m?" out":"")+(same(d,today)?" today":"");
-      cell.innerHTML = `
-<div class="num">${d.getDate()}</div>
-<div class="event ${CLS[x.horario]}">
-    ${ICON[x.horario]} T${x.turno}
-</div>`;;<br>${x.horario}</div>`;
+      cell.innerHTML=`<div class="num">${d.getDate()}</div><div class="event ${CLS[x.horario]}">${ICON[x.horario]} T${x.turno}</div>`;
       cell.onclick=()=>openDetails(d);$("calendar").appendChild(cell);
     }
   }
@@ -408,4 +404,3 @@
 </script>
 </body>
 </html>
-Release 🟢 v2.0.4 Stable
