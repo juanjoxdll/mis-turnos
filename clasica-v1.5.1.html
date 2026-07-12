@@ -24,24 +24,24 @@
       --morningText:#9bd0ff;--afternoonText:#ffdb7b;--nightText:#c9b2ff;--restText:#91e4c5;
     }
     *{box-sizing:border-box}
-    html{background:var(--bg);width:100%;overflow-x:hidden}
-    body{margin:0;width:100%;overflow-x:hidden;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    html{background:var(--bg)}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
     button,input,select{font:inherit}
     button{border:0;border-radius:13px;padding:10px 14px;cursor:pointer;background:var(--primary);color:#fff;font-weight:700}
     button.secondary{background:var(--card);color:var(--text);border:1px solid var(--line)}
-    .version-switch{display:inline-flex;align-items:center;text-decoration:none;border-radius:13px;padding:10px 14px;background:var(--primary);color:#fff;font-weight:700}
     .app{width:min(1120px,100%);margin:auto;padding:16px 16px calc(26px + env(safe-area-inset-bottom))}
     .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:6px 0 16px}
     .brand h1{margin:0;font-size:clamp(28px,5vw,44px);letter-spacing:-.04em}
     .brand p{margin:4px 0 0;color:var(--muted)}
     .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .version-switch{display:inline-flex;align-items:center;text-decoration:none;border-radius:13px;padding:10px 14px;background:var(--primary);color:#fff;font-weight:700}
     .version{font-size:12px;padding:5px 8px;border-radius:999px;background:rgba(101,88,245,.12);color:var(--primary)}
     .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-bottom:16px}
     .card{background:var(--card);border:1px solid var(--line);border-radius:21px;padding:18px;box-shadow:var(--shadow)}
-    .today{position:relative;overflow:hidden;background:linear-gradient(145deg,var(--card),color-mix(in srgb,var(--primary) 7%,var(--card)))}
+    .today{position:relative;overflow:hidden}
     .today:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-70px;top:-85px;background:linear-gradient(135deg,var(--primary),var(--primary2));opacity:.12}
     .today-main{display:flex;gap:14px;align-items:center;position:relative;z-index:1}
-    .icon{width:76px;height:76px;border-radius:24px;display:grid;place-items:center;font-size:36px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+    .icon{width:72px;height:72px;border-radius:21px;display:grid;place-items:center;font-size:34px}
     .today-title{font-size:clamp(22px,4vw,31px);font-weight:850;letter-spacing:-.03em}
     .muted{color:var(--muted)}
     .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;position:relative;z-index:1}
@@ -55,17 +55,49 @@
     .calendar-card{padding:0;overflow:hidden}
     .calendar-head{padding:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
     .calendar-head h2{margin:0;font-size:24px}
-    .nav{display:flex;gap:8px}.nav button{min-width:44px}
-    .weekdays,.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));width:100%;min-width:0}
+    .nav{display:flex;gap:8px}
+    .weekdays,.calendar{display:grid;grid-template-columns:repeat(7,1fr)}
     .weekdays{background:color-mix(in srgb,var(--card) 85%,var(--bg));border-bottom:1px solid var(--line)}
     .weekdays div{text-align:center;padding:11px 4px;font-size:12px;color:var(--muted);font-weight:800}
-    .day{min-width:0;min-height:116px;padding:8px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--card);cursor:pointer;transition:.15s;overflow:hidden}
+    .day{
+      min-width:0;
+      min-height:128px;
+      padding:12px 6px;
+      border-right:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+      background:var(--card);
+      cursor:pointer;
+      transition:.15s;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      gap:9px;
+    }
     .day:nth-child(7n){border-right:0}
     .day:hover{box-shadow:inset 0 0 0 2px rgba(101,88,245,.18)}
     .day.out{opacity:.4}
-    .num{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;font-weight:800;margin-bottom:8px}
+    .num{
+      width:44px;
+      height:44px;
+      display:grid;
+      place-items:center;
+      border-radius:14px;
+      font-size:25px;
+      font-weight:900;
+      letter-spacing:-.05em;
+      line-height:1;
+      margin:0 auto;
+      color:var(--text);
+      background:color-mix(in srgb,var(--card) 88%,var(--bg));
+      border:1px solid var(--line);
+      box-shadow:0 3px 10px rgba(15,23,42,.06);
+      text-align:center;
+    }
     .day.today .num{background:var(--primary);color:#fff}
-    .event{min-width:0;max-width:100%;overflow:hidden;border-radius:10px;padding:7px;font-size:12px;font-weight:800;line-height:1.25}
+    .event{border-radius:10px;padding:7px;font-size:12px;font-weight:800;line-height:1.25}
     .morning{background:var(--morning);color:var(--morningText)}
     .afternoon{background:var(--afternoon);color:var(--afternoonText)}
     .night{background:var(--night);color:var(--nightText)}
@@ -83,20 +115,12 @@
     .settings{display:grid;gap:12px;margin-top:16px}
     .settings label small{display:block;color:var(--muted);margin-bottom:5px}
     .settings input,.settings select{width:100%}
-    .bottom-nav{display:none}
-    .bottom-nav button{background:transparent;color:var(--muted);padding:7px 12px;border-radius:14px;min-width:72px;font-size:12px}
-    .bottom-nav button span{display:block;font-size:21px;line-height:1.1;margin-bottom:3px}
-    .bottom-nav button.active{color:var(--primary);background:color-mix(in srgb,var(--primary) 10%,var(--card))}
     @media(max-width:780px){
-      body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
-      .app{padding:calc(10px + env(safe-area-inset-top)) 8px 18px}.topbar{margin-bottom:10px}.brand h1{font-size:30px}.brand p{font-size:13px}
-      .actions #settingsBtn,.actions #todayBtn{display:none}.actions{margin-left:auto}.actions button{padding:9px 11px}.actions #themeBtn{font-size:0}.actions #themeBtn::first-letter{font-size:19px}.actions #helpBtn{font-size:0}.actions #helpBtn::before{content:"❓";font-size:19px}.version-switch{padding:8px 10px;font-size:11px}
-      .hero{grid-template-columns:1fr;gap:10px}.card{border-radius:18px;padding:14px}.today-main{gap:12px}.icon{width:62px;height:62px;border-radius:19px;font-size:29px}.today-title{font-size:22px}
-      .facts{grid-template-columns:repeat(3,1fr);gap:6px;margin-top:13px}.fact{padding:9px 7px;border-radius:12px}.fact small{font-size:10px}.fact strong{font-size:11px;line-height:1.25;display:block}
-      .calendar-head{padding:12px}.calendar-head h2{font-size:19px}.details{grid-template-columns:1fr}
-      .weekdays div{min-width:0;padding:9px 1px;font-size:10px}.day{min-height:78px;padding:7px 2px 5px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}.num{width:34px;height:34px;font-size:18px;font-weight:900;margin:0;line-height:1;letter-spacing:-.02em}.day.today .num{box-shadow:0 5px 14px rgba(101,88,245,.35)}.event{width:calc(100% - 4px);font-size:9px;padding:3px 1px;border-radius:999px;white-space:normal;overflow-wrap:anywhere;line-height:1.2}.event br{display:block}
-      .legend{justify-content:center;gap:5px}.legend span{font-size:11px;padding:6px 8px}
-      .bottom-nav{position:fixed;display:flex;align-items:center;justify-content:space-around;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:40;background:color-mix(in srgb,var(--card) 94%,transparent);border:1px solid var(--line);border-radius:20px;padding:6px;box-shadow:0 14px 45px rgba(15,20,35,.22);backdrop-filter:blur(18px)}
+      .hero{grid-template-columns:1fr}.facts{grid-template-columns:1fr}
+      .day{min-height:82px;padding:5px}.event{font-size:10px;padding:5px}
+      .app{padding:10px 8px calc(20px + env(safe-area-inset-bottom))}
+      .calendar-head h2{font-size:20px}.details{grid-template-columns:1fr}
+      .brand p{font-size:14px}
     }
   </style>
 </head>
@@ -108,8 +132,7 @@
       <p>Tu calendario automático de cuatro turnos</p>
     </div>
     <div class="actions">
-      <a class="version-switch" href="./index.html">✨ Ir a versión 🟢 v2.0.4 Stable</a>
-      <button id="helpBtn" class="secondary">❓ Ayuda</button>
+      <a class="version-switch" href="./index.html">✨ Ir a versión 🟢 v2.5 Stable</a>
       <button id="themeBtn" class="secondary">🌙 Modo oscuro</button>
       <button id="settingsBtn" class="secondary">⚙️ Configurar</button>
       <button id="todayBtn">Hoy</button>
@@ -164,12 +187,6 @@
   </div>
 </main>
 
-<nav class="bottom-nav" aria-label="Navegación principal">
-  <button id="bottomToday" class="active"><span>📅</span>Hoy</button>
-  <button id="bottomSearch"><span>🔎</span>Buscar</button>
-  <button id="bottomSettings"><span>⚙️</span>Ajustes</button>
-</nav>
-
 <div id="detailsModal" class="modal">
   <div class="modal-box">
     <div class="modal-top">
@@ -199,23 +216,8 @@
           <option value="3">Turno 3</option><option value="4">Turno 4</option>
         </select>
       </label>
-      <div class="muted">Ciclo confirmado: T1 14/06, T2 12/07, T3 09/08, T4 07/09 y regreso a T1 el 04/10.</div>
+      <div class="muted">Cada turno se calcula en bloques de 28 días. Valor inicial: 14/06/2026, Turno 1.</div>
       <button id="saveSettings">Guardar cambios</button>
-    </div>
-  </div>
-</div>
-
-<div id="helpModal" class="modal">
-  <div class="modal-box">
-    <div class="modal-top">
-      <div><h2 style="margin:0">Ayuda</h2><div class="muted">Vista clásica v1.5.1</div></div>
-      <button id="closeHelp" class="close">✕</button>
-    </div>
-    <div class="settings">
-      <div><strong>Cómo leer el calendario</strong><div class="muted">🌅 Mañana · 🌇 Tarde · 🌙 Noche · 😴 Descanso. Toca cualquier día para ver sus detalles.</div></div>
-      <div><strong>Rotación oficial</strong><div class="muted">T1 14/06/2026, T2 12/07, T3 09/08, T4 07/09 y regreso a T1 el 04/10.</div></div>
-      <div><strong>Configuración</strong><div class="muted">Los ajustes de esta vista se guardan en el dispositivo. Usa Configurar para modificarlos.</div></div>
-      <div><strong>Versión final</strong><div class="muted">Usa el botón superior para regresar a Mis Turnos 🟢 v2.0.4 Stable.</div></div>
     </div>
   </div>
 </div>
@@ -233,16 +235,6 @@
   const CLS={Mañana:"morning",Tarde:"afternoon",Noche:"night",Descanso:"rest"};
   const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
-  const CONFIG_VERSION="1.5.1";
-  const savedVersion=localStorage.getItem("mt.configVersion");
-  const savedBase=localStorage.getItem("mt.baseDate");
-  const savedShift=localStorage.getItem("mt.baseShift");
-  // Migra únicamente la configuración predeterminada de v1.1; conserva ajustes personales.
-  if(savedVersion!==CONFIG_VERSION && (!savedBase || ((savedBase==="2026-06-14" || savedBase==="2026-06-15") && (!savedShift || savedShift==="1")))){
-    localStorage.setItem("mt.baseDate","2026-06-14");
-    localStorage.setItem("mt.baseShift","1");
-  }
-  localStorage.setItem("mt.configVersion",CONFIG_VERSION);
   let baseString=localStorage.getItem("mt.baseDate")||"2026-06-14";
   let baseShift=Number(localStorage.getItem("mt.baseShift")||1);
   let [by,bm,bd]=baseString.split("-").map(Number);
@@ -258,22 +250,13 @@
   const long=d=>new Intl.DateTimeFormat("es-MX",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(d);
   const short=d=>new Intl.DateTimeFormat("es-MX",{day:"numeric",month:"short",year:"numeric"}).format(d);
 
-  const CYCLE=112;
-  const STARTS=[0,28,56,85,112];
-  const ENTRY={1:"Mañana",2:"Tarde",3:"Noche",4:"Noche"};
-
   function info(date){
-    const d=norm(date);
-    // La fecha configurada representa el inicio del turno elegido.
-    const anchorT1=add(baseDate,-STARTS[baseShift-1]);
-    const cycleDay=mod(diff(d,anchorT1),CYCLE);
-    let index=0;
-    while(index<3&&cycleDay>=STARTS[index+1])index++;
-    const turno=index+1,dayIn=cycleDay-STARTS[index],daysToChange=STARTS[index+1]-cycleDay;
+    const d=norm(date), days=diff(d,baseDate), block=Math.floor(days/28), dayIn=mod(days,28);
+    const turno=mod((baseShift-1)+block,4)+1;
     let horario=TURNOS[turno].days[d.getDay()];
-    // El primer día se trabaja el turno nuevo, aunque su patrón normal marque descanso.
-    if(dayIn===0)horario=ENTRY[turno];
-    return {turno,horario,trabaja:horario!=="Descanso",dayIn,nextChange:add(d,daysToChange)};
+    // El primer día del bloque cubre inmediatamente el nuevo turno.
+    if(dayIn===0) horario=turno===1?"Mañana":turno===2?"Tarde":turno===3?"Noche":"Tarde";
+    return {turno,horario,trabaja:horario!=="Descanso",dayIn,nextChange:add(d,28-dayIn)};
   }
 
   function findRest(date){
@@ -294,12 +277,29 @@
     $("calendar").innerHTML="";
     const y=viewDate.getFullYear(),m=viewDate.getMonth();
     $("monthTitle").textContent=`${MONTHS[m]} ${y}`;
-    const first=new Date(y,m,1,12),offset=(first.getDay()+6)%7,start=add(first,-offset),today=norm(new Date());
-    for(let i=0;i<42;i++){
-      const d=add(start,i),x=info(d),cell=document.createElement("div");
-      cell.className="day"+(d.getMonth()!==m?" out":"")+(same(d,today)?" today":"");
-      cell.innerHTML=`<div class="num">${d.getDate()}</div><div class="event ${CLS[x.horario]}" title="${x.horario}">${ICON[x.horario]} T${x.turno}</div>`;
-      cell.onclick=()=>openDetails(d);$("calendar").appendChild(cell);
+
+    const first=new Date(y,m,1,12);
+    const offset=(first.getDay()+6)%7;
+    const totalDays=new Date(y,m+1,0,12).getDate();
+    const today=norm(new Date());
+
+    // Espacios vacíos antes del día 1.
+    for(let i=0;i<offset;i++){
+      const empty=document.createElement("div");
+      empty.className="day out";
+      empty.setAttribute("aria-hidden","true");
+      $("calendar").appendChild(empty);
+    }
+
+    // Solo se muestran los días del mes actual.
+    for(let day=1;day<=totalDays;day++){
+      const d=new Date(y,m,day,12);
+      const x=info(d);
+      const cell=document.createElement("div");
+      cell.className="day"+(same(d,today)?" today":"");
+      cell.innerHTML=`<div class="num">${day}</div><div class="event ${CLS[x.horario]}" title="${x.horario}">${ICON[x.horario]} T${x.turno}</div>`;
+      cell.onclick=()=>openDetails(d);
+      $("calendar").appendChild(cell);
     }
   }
 
@@ -314,9 +314,6 @@
   $("prevBtn").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar()};
   $("nextBtn").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar()};
   $("todayBtn").onclick=()=>{viewDate=new Date();renderCalendar()};
-  $("bottomToday").onclick=()=>{viewDate=new Date();renderCalendar();window.scrollTo({top:0,behavior:"smooth"})};
-  $("bottomSearch").onclick=()=>{$("dateSearch").focus();$("dateSearch").scrollIntoView({behavior:"smooth",block:"center"})};
-  $("bottomSettings").onclick=()=>$("settingsBtn").click();
   $("searchBtn").onclick=()=>{
     const v=$("dateSearch").value;if(!v)return;
     const [y,m,d]=v.split("-").map(Number),date=new Date(y,m-1,d,12),x=info(date);
@@ -329,9 +326,6 @@
   $("settingsBtn").onclick=()=>{$("baseDate").value=baseString;$("baseShift").value=String(baseShift);$("settingsModal").classList.add("show")};
   $("closeSettings").onclick=()=>$("settingsModal").classList.remove("show");
   $("settingsModal").onclick=e=>{if(e.target===$("settingsModal"))$("settingsModal").classList.remove("show")};
-  $("helpBtn").onclick=()=>$("helpModal").classList.add("show");
-  $("closeHelp").onclick=()=>$("helpModal").classList.remove("show");
-  $("helpModal").onclick=e=>{if(e.target===$("helpModal"))$("helpModal").classList.remove("show")};
   $("saveSettings").onclick=()=>{
     baseString=$("baseDate").value;baseShift=Number($("baseShift").value);
     if(!baseString)return;localStorage.setItem("mt.baseDate",baseString);localStorage.setItem("mt.baseShift",String(baseShift));
