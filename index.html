@@ -103,7 +103,7 @@
 <main class="app">
   <header class="topbar">
     <div class="brand">
-      <div style="display:flex;align-items:center;gap:9px"><h1>Mis Turnos</h1><span class="version">v1.4</span></div>
+      <div style="display:flex;align-items:center;gap:9px"><h1>Mis Turnos</h1><span class="version">v1.5</span></div>
       <p>Tu calendario automático de cuatro turnos</p>
     </div>
     <div class="actions">
@@ -196,7 +196,7 @@
           <option value="3">Turno 3</option><option value="4">Turno 4</option>
         </select>
       </label>
-      <div class="muted">Cada turno se calcula en bloques de 28 días. Valor inicial corregido: 15/06/2026, Turno 1. Los cambios de turno ocurren cada 28 días en lunes.</div>
+      <div class="muted">Ciclo confirmado: T1 14/06, T2 12/07, T3 09/08, T4 07/09 y regreso a T1 el 04/10.</div>
       <button id="saveSettings">Guardar cambios</button>
     </div>
   </div>
@@ -215,17 +215,17 @@
   const CLS={Mañana:"morning",Tarde:"afternoon",Noche:"night",Descanso:"rest"};
   const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
-  const CONFIG_VERSION="1.4";
+  const CONFIG_VERSION="1.5";
   const savedVersion=localStorage.getItem("mt.configVersion");
   const savedBase=localStorage.getItem("mt.baseDate");
   const savedShift=localStorage.getItem("mt.baseShift");
   // Migra únicamente la configuración predeterminada de v1.1; conserva ajustes personales.
-  if(savedVersion!==CONFIG_VERSION && (!savedBase || (savedBase==="2026-06-14" && (!savedShift || savedShift==="1")))){
-    localStorage.setItem("mt.baseDate","2026-06-15");
+  if(savedVersion!==CONFIG_VERSION && (!savedBase || ((savedBase==="2026-06-14" || savedBase==="2026-06-15") && (!savedShift || savedShift==="1")))){
+    localStorage.setItem("mt.baseDate","2026-06-14");
     localStorage.setItem("mt.baseShift","1");
   }
   localStorage.setItem("mt.configVersion",CONFIG_VERSION);
-  let baseString=localStorage.getItem("mt.baseDate")||"2026-06-15";
+  let baseString=localStorage.getItem("mt.baseDate")||"2026-06-14";
   let baseShift=Number(localStorage.getItem("mt.baseShift")||1);
   let [by,bm,bd]=baseString.split("-").map(Number);
   let baseDate=new Date(by,bm-1,bd,12);
@@ -240,13 +240,23 @@
   const long=d=>new Intl.DateTimeFormat("es-MX",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(d);
   const short=d=>new Intl.DateTimeFormat("es-MX",{day:"numeric",month:"short",year:"numeric"}).format(d);
 
+  const CYCLE=112;
+  const STARTS=[0,28,56,85,112];
+  const ENTRY={1:"Mañana",2:"Tarde",3:"Noche",4:"Tarde"};
+
   function info(date){
-    const d=norm(date), days=diff(d,baseDate), block=Math.floor(days/28), dayIn=mod(days,28);
-    const turno=mod((baseShift-1)+block,4)+1;
+    const d=norm(date);
+    // La fecha configurada representa el inicio del turno elegido.
+    const anchorT1=add(baseDate,-STARTS[baseShift-1]);
+    const cycleDay=mod(diff(d,anchorT1),CYCLE);
+    let index=0;
+    while(index<3&&cycleDay>=STARTS[index+1])index++;
+    const turno=index+1,dayIn=cycleDay-STARTS[index],daysToChange=STARTS[index+1]-cycleDay;
     let horario=TURNOS[turno].days[d.getDay()];
-    // El primer día del bloque cubre inmediatamente el nuevo turno.
-    if(dayIn===0) horario=turno===1?"Mañana":turno===2?"Tarde":turno===3?"Noche":"Tarde";
-    return {turno,horario,trabaja:horario!=="Descanso",dayIn,nextChange:add(d,28-dayIn)};
+    // Se descansa antes de la transición y al día siguiente se cubre el turno nuevo.
+    if(daysToChange===1)horario="Descanso";
+    if(dayIn===0)horario=ENTRY[turno];
+    return {turno,horario,trabaja:horario!=="Descanso",dayIn,nextChange:add(d,daysToChange)};
   }
 
   function findRest(date){
