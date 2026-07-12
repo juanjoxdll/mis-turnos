@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mis Turnos</title>
+  <meta name="theme-color" content="#6558f5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Mis Turnos">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <style>
+    :root{
+      --bg:#f5f7fb;--card:#fff;--text:#182033;--muted:#697386;--line:#e6e9f0;
+      --primary:#6558f5;--primary2:#8478ff;--shadow:0 12px 34px rgba(29,37,59,.08);
+      --morning:#dceeff;--afternoon:#fff0c9;--night:#eadfff;--rest:#dcf7ec;
+      --morningText:#245f92;--afternoonText:#8b6500;--nightText:#6344a2;--restText:#287557;
+    }
+    [data-theme="dark"]{
+      --bg:#111522;--card:#1a2030;--text:#f4f6fb;--muted:#aab3c5;--line:#2d3548;
+      --shadow:0 12px 34px rgba(0,0,0,.24);
+      --morning:#193650;--afternoon:#4a3c18;--night:#34284f;--rest:#173b31;
+      --morningText:#9bd0ff;--afternoonText:#ffdb7b;--nightText:#c9b2ff;--restText:#91e4c5;
+    }
+    *{box-sizing:border-box}
+    html{background:var(--bg);width:100%;overflow-x:hidden}
+    body{margin:0;width:100%;overflow-x:hidden;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    button,input,select{font:inherit}
+    button{border:0;border-radius:13px;padding:10px 14px;cursor:pointer;background:var(--primary);color:#fff;font-weight:700}
+    button.secondary{background:var(--card);color:var(--text);border:1px solid var(--line)}
+    .version-switch{display:inline-flex;align-items:center;text-decoration:none;border-radius:13px;padding:10px 14px;background:var(--primary);color:#fff;font-weight:700}
+    .app{width:min(1120px,100%);margin:auto;padding:16px 16px calc(26px + env(safe-area-inset-bottom))}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:6px 0 16px}
+    .brand h1{margin:0;font-size:clamp(28px,5vw,44px);letter-spacing:-.04em}
+    .brand p{margin:4px 0 0;color:var(--muted)}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .version{font-size:12px;padding:5px 8px;border-radius:999px;background:rgba(101,88,245,.12);color:var(--primary)}
+    .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-bottom:16px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:21px;padding:18px;box-shadow:var(--shadow)}
+    .today{position:relative;overflow:hidden;background:linear-gradient(145deg,var(--card),color-mix(in srgb,var(--primary) 7%,var(--card)))}
+    .today:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-70px;top:-85px;background:linear-gradient(135deg,var(--primary),var(--primary2));opacity:.12}
+    .today-main{display:flex;gap:14px;align-items:center;position:relative;z-index:1}
+    .icon{width:76px;height:76px;border-radius:24px;display:grid;place-items:center;font-size:36px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+    .today-title{font-size:clamp(22px,4vw,31px);font-weight:850;letter-spacing:-.03em}
+    .muted{color:var(--muted)}
+    .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;position:relative;z-index:1}
+    .fact{border:1px solid var(--line);border-radius:15px;padding:12px;background:color-mix(in srgb,var(--card) 90%,var(--bg))}
+    .fact small{display:block;color:var(--muted);margin-bottom:5px}
+    .fact strong{font-size:14px}
+    .search-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+    input,select{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:12px;padding:11px 12px}
+    .search-row input{flex:1;min-width:170px}
+    .result{margin-top:12px;border-radius:14px;padding:12px;background:var(--bg);min-height:48px}
+    .calendar-card{padding:0;overflow:hidden}
+    .calendar-head{padding:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+    .calendar-head h2{margin:0;font-size:24px}
+    .nav{display:flex;gap:8px}.nav button{min-width:44px}
+    .weekdays,.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));width:100%;min-width:0}
+    .weekdays{background:color-mix(in srgb,var(--card) 85%,var(--bg));border-bottom:1px solid var(--line)}
+    .weekdays div{text-align:center;padding:11px 4px;font-size:12px;color:var(--muted);font-weight:800}
+    .day{min-width:0;min-height:116px;padding:8px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--card);cursor:pointer;transition:.15s;overflow:hidden}
+    .day:nth-child(7n){border-right:0}
+    .day:hover{box-shadow:inset 0 0 0 2px rgba(101,88,245,.18)}
+    .day.out{opacity:.4}
+    .num{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;font-weight:800;margin-bottom:8px}
+    .day.today .num{background:var(--primary);color:#fff}
+    .event{min-width:0;max-width:100%;overflow:hidden;border-radius:10px;padding:7px;font-size:12px;font-weight:800;line-height:1.25}
+    .morning{background:var(--morning);color:var(--morningText)}
+    .afternoon{background:var(--afternoon);color:var(--afternoonText)}
+    .night{background:var(--night);color:var(--nightText)}
+    .rest{background:var(--rest);color:var(--restText)}
+    .legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .legend span{padding:7px 10px;border-radius:999px;font-size:13px;font-weight:750}
+    .modal{position:fixed;inset:0;background:rgba(10,14,24,.55);display:none;place-items:center;padding:16px;z-index:50}
+    .modal.show{display:grid}
+    .modal-box{width:min(460px,100%);background:var(--card);border:1px solid var(--line);border-radius:23px;padding:20px;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+    .modal-top{display:flex;justify-content:space-between;align-items:start;gap:12px}
+    .close{width:38px;height:38px;padding:0;border-radius:50%;background:var(--bg);color:var(--text)}
+    .details{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+    .detail{padding:12px;border-radius:14px;background:var(--bg)}
+    .detail small{display:block;color:var(--muted);margin-bottom:5px}
+    .settings{display:grid;gap:12px;margin-top:16px}
+    .settings label small{display:block;color:var(--muted);margin-bottom:5px}
+    .settings input,.settings select{width:100%}
+    .bottom-nav{display:none}
+    .bottom-nav button{background:transparent;color:var(--muted);padding:7px 12px;border-radius:14px;min-width:72px;font-size:12px}
+    .bottom-nav button span{display:block;font-size:21px;line-height:1.1;margin-bottom:3px}
+    .bottom-nav button.active{color:var(--primary);background:color-mix(in srgb,var(--primary) 10%,var(--card))}
+    @media(max-width:780px){
+      body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+      .app{padding:calc(10px + env(safe-area-inset-top)) 8px 18px}.topbar{margin-bottom:10px}.brand h1{font-size:30px}.brand p{font-size:13px}
+      .actions #settingsBtn,.actions #todayBtn{display:none}.actions{margin-left:auto}.actions button{padding:9px 11px}.actions #themeBtn{font-size:0}.actions #themeBtn::first-letter{font-size:19px}.actions #helpBtn{font-size:0}.actions #helpBtn::before{content:"❓";font-size:19px}.version-switch{padding:8px 10px;font-size:11px}
+      .hero{grid-template-columns:1fr;gap:10px}.card{border-radius:18px;padding:14px}.today-main{gap:12px}.icon{width:62px;height:62px;border-radius:19px;font-size:29px}.today-title{font-size:22px}
+      .facts{grid-template-columns:repeat(3,1fr);gap:6px;margin-top:13px}.fact{padding:9px 7px;border-radius:12px}.fact small{font-size:10px}.fact strong{font-size:11px;line-height:1.25;display:block}
+      .calendar-head{padding:12px}.calendar-head h2{font-size:19px}.details{grid-template-columns:1fr}
+      .weekdays div{min-width:0;padding:9px 1px;font-size:10px}.day{min-height:78px;padding:7px 2px 5px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}.num{width:34px;height:34px;font-size:18px;font-weight:900;margin:0;line-height:1;letter-spacing:-.02em}.day.today .num{box-shadow:0 5px 14px rgba(101,88,245,.35)}.event{width:calc(100% - 4px);font-size:9px;padding:3px 1px;border-radius:999px;white-space:normal;overflow-wrap:anywhere;line-height:1.2}.event br{display:block}
+      .legend{justify-content:center;gap:5px}.legend span{font-size:11px;padding:6px 8px}
+      .bottom-nav{position:fixed;display:flex;align-items:center;justify-content:space-around;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:40;background:color-mix(in srgb,var(--card) 94%,transparent);border:1px solid var(--line);border-radius:20px;padding:6px;box-shadow:0 14px 45px rgba(15,20,35,.22);backdrop-filter:blur(18px)}
+    }
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div style="display:flex;align-items:center;gap:9px"><h1>Mis Turnos</h1><span class="version">v1.5.1</span></div>
+      <p>Tu calendario automático de cuatro turnos</p>
+    </div>
+    <div class="actions">
+      <a class="version-switch" href="./index.html">✨ Ir a versión 2.0.2</a>
+      <button id="helpBtn" class="secondary">❓ Ayuda</button>
+      <button id="themeBtn" class="secondary">🌙 Modo oscuro</button>
+      <button id="settingsBtn" class="secondary">⚙️ Configurar</button>
+      <button id="todayBtn">Hoy</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <article class="card today">
+      <div class="today-main">
+        <div id="todayIcon" class="icon"></div>
+        <div>
+          <div id="todayTitle" class="today-title">Cargando…</div>
+          <div id="todayDate" class="muted"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div class="fact"><small>Estado</small><strong id="todayStatus"></strong></div>
+        <div class="fact"><small>Próximo descanso</small><strong id="nextRest"></strong></div>
+        <div class="fact"><small>Próximo cambio</small><strong id="nextChange"></strong></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <strong>Consultar una fecha</strong>
+      <div class="search-row">
+        <input id="dateSearch" type="date">
+        <button id="searchBtn">Buscar</button>
+      </div>
+      <div id="searchResult" class="result">Selecciona una fecha para consultar tu turno.</div>
+    </article>
+  </section>
+
+  <section class="card calendar-card">
+    <div class="calendar-head">
+      <h2 id="monthTitle"></h2>
+      <div class="nav">
+        <button id="prevBtn" class="secondary">←</button>
+        <button id="nextBtn" class="secondary">→</button>
+      </div>
+    </div>
+    <div class="weekdays">
+      <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
+    </div>
+    <div id="calendar" class="calendar"></div>
+  </section>
+
+  <div class="legend">
+    <span class="morning">🌅 Mañana</span>
+    <span class="afternoon">🌇 Tarde</span>
+    <span class="night">🌙 Noche</span>
+    <span class="rest">😴 Descanso</span>
+  </div>
+</main>
+
+<nav class="bottom-nav" aria-label="Navegación principal">
+  <button id="bottomToday" class="active"><span>📅</span>Hoy</button>
+  <button id="bottomSearch"><span>🔎</span>Buscar</button>
+  <button id="bottomSettings"><span>⚙️</span>Ajustes</button>
+</nav>
+
+<div id="detailsModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <div><h2 id="detailDate" style="margin:0"></h2><div id="detailStatus" class="muted"></div></div>
+      <button id="closeDetails" class="close">✕</button>
+    </div>
+    <div class="details">
+      <div class="detail"><small>Turno</small><strong id="detailShift"></strong></div>
+      <div class="detail"><small>Horario</small><strong id="detailSchedule"></strong></div>
+      <div class="detail"><small>Próximo descanso</small><strong id="detailRest"></strong></div>
+      <div class="detail"><small>Próximo cambio</small><strong id="detailChange"></strong></div>
+    </div>
+  </div>
+</div>
+
+<div id="settingsModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <div><h2 style="margin:0">Configuración</h2><div class="muted">Usa una fecha en la que estés seguro de que comenzó un turno.</div></div>
+      <button id="closeSettings" class="close">✕</button>
+    </div>
+    <div class="settings">
+      <label><small>Fecha base</small><input id="baseDate" type="date"></label>
+      <label><small>Turno que comenzó ese día</small>
+        <select id="baseShift">
+          <option value="1">Turno 1</option><option value="2">Turno 2</option>
+          <option value="3">Turno 3</option><option value="4">Turno 4</option>
+        </select>
+      </label>
+      <div class="muted">Ciclo confirmado: T1 14/06, T2 12/07, T3 09/08, T4 07/09 y regreso a T1 el 04/10.</div>
+      <button id="saveSettings">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<div id="helpModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <div><h2 style="margin:0">Ayuda</h2><div class="muted">Vista clásica v1.5.1</div></div>
+      <button id="closeHelp" class="close">✕</button>
+    </div>
+    <div class="settings">
+      <div><strong>Cómo leer el calendario</strong><div class="muted">🌅 Mañana · 🌇 Tarde · 🌙 Noche · 😴 Descanso. Toca cualquier día para ver sus detalles.</div></div>
+      <div><strong>Rotación oficial</strong><div class="muted">T1 14/06/2026, T2 12/07, T3 09/08, T4 07/09 y regreso a T1 el 04/10.</div></div>
+      <div><strong>Configuración</strong><div class="muted">Los ajustes de esta vista se guardan en el dispositivo. Usa Configurar para modificarlos.</div></div>
+      <div><strong>Versión final</strong><div class="muted">Usa el botón superior para regresar a Mis Turnos v2.0.2.</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const DAY = 86400000;
+  const TURNOS = {
+    1:{name:"Turno 1",days:{0:"Mañana",1:"Mañana",2:"Mañana",3:"Mañana",4:"Mañana",5:"Mañana",6:"Descanso"}},
+    2:{name:"Turno 2",days:{0:"Descanso",1:"Tarde",2:"Tarde",3:"Tarde",4:"Tarde",5:"Tarde",6:"Tarde"}},
+    3:{name:"Turno 3",days:{0:"Noche",1:"Descanso",2:"Descanso",3:"Noche",4:"Noche",5:"Noche",6:"Noche"}},
+    4:{name:"Turno 4",days:{0:"Tarde",1:"Noche",2:"Noche",3:"Descanso",4:"Descanso",5:"Mañana",6:"Mañana"}}
+  };
+  const ICON={Mañana:"🌅",Tarde:"🌇",Noche:"🌙",Descanso:"😴"};
+  const CLS={Mañana:"morning",Tarde:"afternoon",Noche:"night",Descanso:"rest"};
+  const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+  const CONFIG_VERSION="1.5.1";
+  const savedVersion=localStorage.getItem("mt.configVersion");
+  const savedBase=localStorage.getItem("mt.baseDate");
+  const savedShift=localStorage.getItem("mt.baseShift");
+  // Migra únicamente la configuración predeterminada de v1.1; conserva ajustes personales.
+  if(savedVersion!==CONFIG_VERSION && (!savedBase || ((savedBase==="2026-06-14" || savedBase==="2026-06-15") && (!savedShift || savedShift==="1")))){
+    localStorage.setItem("mt.baseDate","2026-06-14");
+    localStorage.setItem("mt.baseShift","1");
+  }
+  localStorage.setItem("mt.configVersion",CONFIG_VERSION);
+  let baseString=localStorage.getItem("mt.baseDate")||"2026-06-14";
+  let baseShift=Number(localStorage.getItem("mt.baseShift")||1);
+  let [by,bm,bd]=baseString.split("-").map(Number);
+  let baseDate=new Date(by,bm-1,bd,12);
+  let viewDate=new Date();
+
+  const $=id=>document.getElementById(id);
+  const norm=d=>{const x=new Date(d);x.setHours(12,0,0,0);return x};
+  const add=(d,n)=>{const x=norm(d);x.setDate(x.getDate()+n);return x};
+  const diff=(a,b)=>Math.round((norm(a)-norm(b))/DAY);
+  const mod=(n,m)=>((n%m)+m)%m;
+  const same=(a,b)=>a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+  const long=d=>new Intl.DateTimeFormat("es-MX",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(d);
+  const short=d=>new Intl.DateTimeFormat("es-MX",{day:"numeric",month:"short",year:"numeric"}).format(d);
+
+  const CYCLE=112;
+  const STARTS=[0,28,56,85,112];
+  const ENTRY={1:"Mañana",2:"Tarde",3:"Noche",4:"Noche"};
+
+  function info(date){
+    const d=norm(date);
+    // La fecha configurada representa el inicio del turno elegido.
+    const anchorT1=add(baseDate,-STARTS[baseShift-1]);
+    const cycleDay=mod(diff(d,anchorT1),CYCLE);
+    let index=0;
+    while(index<3&&cycleDay>=STARTS[index+1])index++;
+    const turno=index+1,dayIn=cycleDay-STARTS[index],daysToChange=STARTS[index+1]-cycleDay;
+    let horario=TURNOS[turno].days[d.getDay()];
+    // El primer día se trabaja el turno nuevo, aunque su patrón normal marque descanso.
+    if(dayIn===0)horario=ENTRY[turno];
+    return {turno,horario,trabaja:horario!=="Descanso",dayIn,nextChange:add(d,daysToChange)};
+  }
+
+  function findRest(date){
+    for(let i=0;i<40;i++){const d=add(date,i);if(info(d).horario==="Descanso")return d}
+  }
+
+  function renderToday(){
+    const d=norm(new Date()), x=info(d), rest=findRest(d);
+    $("todayIcon").className=`icon ${CLS[x.horario]}`;$("todayIcon").textContent=ICON[x.horario];
+    $("todayTitle").textContent=`${TURNOS[x.turno].name} · ${x.horario}`;
+    $("todayDate").textContent=long(d);
+    $("todayStatus").textContent=x.trabaja?"Trabajas":"Descansas";
+    $("nextRest").textContent=`${short(rest)} · ${diff(rest,d)} días`;
+    $("nextChange").textContent=`${short(x.nextChange)} · ${diff(x.nextChange,d)} días`;
+  }
+
+  function renderCalendar(){
+    $("calendar").innerHTML="";
+    const y=viewDate.getFullYear(),m=viewDate.getMonth();
+    $("monthTitle").textContent=`${MONTHS[m]} ${y}`;
+    const first=new Date(y,m,1,12),offset=(first.getDay()+6)%7,start=add(first,-offset),today=norm(new Date());
+    for(let i=0;i<42;i++){
+      const d=add(start,i),x=info(d),cell=document.createElement("div");
+      cell.className="day"+(d.getMonth()!==m?" out":"")+(same(d,today)?" today":"");
+      cell.innerHTML=`<div class="num">${d.getDate()}</div><div class="event ${CLS[x.horario]}" title="${x.horario}">${ICON[x.horario]} T${x.turno}</div>`;
+      cell.onclick=()=>openDetails(d);$("calendar").appendChild(cell);
+    }
+  }
+
+  function openDetails(d){
+    const x=info(d),rest=findRest(d);
+    $("detailDate").textContent=long(d);$("detailStatus").textContent=x.trabaja?"Día de trabajo":"Día de descanso";
+    $("detailShift").textContent=TURNOS[x.turno].name;$("detailSchedule").textContent=`${ICON[x.horario]} ${x.horario}`;
+    $("detailRest").textContent=short(rest);$("detailChange").textContent=short(x.nextChange);
+    $("detailsModal").classList.add("show");
+  }
+
+  $("prevBtn").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar()};
+  $("nextBtn").onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar()};
+  $("todayBtn").onclick=()=>{viewDate=new Date();renderCalendar()};
+  $("bottomToday").onclick=()=>{viewDate=new Date();renderCalendar();window.scrollTo({top:0,behavior:"smooth"})};
+  $("bottomSearch").onclick=()=>{$("dateSearch").focus();$("dateSearch").scrollIntoView({behavior:"smooth",block:"center"})};
+  $("bottomSettings").onclick=()=>$("settingsBtn").click();
+  $("searchBtn").onclick=()=>{
+    const v=$("dateSearch").value;if(!v)return;
+    const [y,m,d]=v.split("-").map(Number),date=new Date(y,m-1,d,12),x=info(date);
+    $("searchResult").textContent=`${long(date)}: ${TURNOS[x.turno].name}, ${x.horario}. ${x.trabaja?"Trabajas":"Descansas"}.`;
+    viewDate=new Date(y,m-1,1);renderCalendar();
+  };
+
+  $("closeDetails").onclick=()=>$("detailsModal").classList.remove("show");
+  $("detailsModal").onclick=e=>{if(e.target===$("detailsModal"))$("detailsModal").classList.remove("show")};
+  $("settingsBtn").onclick=()=>{$("baseDate").value=baseString;$("baseShift").value=String(baseShift);$("settingsModal").classList.add("show")};
+  $("closeSettings").onclick=()=>$("settingsModal").classList.remove("show");
+  $("settingsModal").onclick=e=>{if(e.target===$("settingsModal"))$("settingsModal").classList.remove("show")};
+  $("helpBtn").onclick=()=>$("helpModal").classList.add("show");
+  $("closeHelp").onclick=()=>$("helpModal").classList.remove("show");
+  $("helpModal").onclick=e=>{if(e.target===$("helpModal"))$("helpModal").classList.remove("show")};
+  $("saveSettings").onclick=()=>{
+    baseString=$("baseDate").value;baseShift=Number($("baseShift").value);
+    if(!baseString)return;localStorage.setItem("mt.baseDate",baseString);localStorage.setItem("mt.baseShift",String(baseShift));
+    [by,bm,bd]=baseString.split("-").map(Number);baseDate=new Date(by,bm-1,bd,12);
+    $("settingsModal").classList.remove("show");renderToday();renderCalendar();
+  };
+
+  let theme=localStorage.getItem("mt.theme")||"light";
+  function applyTheme(){document.documentElement.dataset.theme=theme;$("themeBtn").textContent=theme==="dark"?"☀️ Modo claro":"🌙 Modo oscuro"}
+  $("themeBtn").onclick=()=>{theme=theme==="dark"?"light":"dark";localStorage.setItem("mt.theme",theme);applyTheme()};
+  applyTheme();
+
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
+  renderToday();renderCalendar();
+})();
+</script>
+</body>
+</html>
